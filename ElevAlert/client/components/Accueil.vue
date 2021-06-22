@@ -1,38 +1,6 @@
 <template>
 	<div id="acc">
-      	<header>
-	      <nav class="navBar">
-		    <router-link to='/' class="navButton"> Accueil </router-link>
-		    <router-link to='/login' class="navButton" v-if="!isLoggedIn"> Connexion </router-link>
-		    <router-link to='/register/0' class="navButton" v-if="!isLoggedIn"> Inscription </router-link>
-		    <router-link to='/profile' class="navButton" v-if="isLoggedIn"> Profile </router-link>
-		    <router-link to='/shop' class="navButton" v-if="isLoggedIn"> Boutique </router-link>
-		    <router-link to='/combat' class="navButton" v-if="isLoggedIn"> Combat </router-link>
-		  </nav>
-		  <div class="fade-in1">
-	        <h1 id="title">Les derniers survivants</h1>
-	        <h2 id="subtitle" >La horde arrive !</h2>
-	      </div>
-	    </header>
-	    <div class="fade-in2">
-		  <p class="text"> Vous êtes parmi les derniers survivants de la Terre face aux zombies.</p>
-		  <p class="text"> Inscrivez-vous maintenant et faite partie de la résistance ! </p>
-		</div>
-		<button @click="redirectReg" class="fade-in3"> Jouer dès maintenant ! </button>
-		<div class="fade-in4">
-		  <p class="partName"> Extraits du jeu </p>
-		  <p class="subPart"> Combattez des zombies ! </p>
-		  <div class="pictures clip-path" id="ex1" ></div>
-		  <p class="subPart"> Achetez des nouveaux équipements ! </p>
-		  <div class="pictures clip-path" id="ex2"></div>
-		</div>
-		<div class="fade-in5">
-		  <p class="partName"> Patch notes </p>
-		  <h2> V 1.0 </h2>
-		  <p class="text"> Le jeu est enfin sorti ! Refonte du site à prévoir dans les prochains jours. </p>
-		  <h2> V 2.0 </h2>
-		  <p class="text"> Mourir ne réinitialise plus l'inventaire, uniquement l'argent </p>
-		</div>
+		
 	</div>
 </template>
 
@@ -47,7 +15,7 @@
 	  }
 	},
 	mounted() {
-	  document.body.style="background-image:url('https://wallup.net/wp-content/uploads/2018/10/03/944615-dark-art-artwork-fantasy-artistic-original-psychedelic-horror-evil-creepy-scary-spooky-halloween.jpg'); background-attachment:fixed;"
+	  //document.body.style="background-image:url('https://wallup.net/wp-content/uploads/2018/10/03/944615-dark-art-artwork-fantasy-artistic-original-psychedelic-horror-evil-creepy-scary-spooky-halloween.jpg'); background-attachment:fixed;"
 	},
 	computed: {
 	  isLoggedIn: function() {
