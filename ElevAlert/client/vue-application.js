@@ -1,17 +1,20 @@
 const Accueil = window.httpVueLoader('./components/Accueil.vue')
 const Login = window.httpVueLoader('./components/Login.vue')
-const Register = window.httpVueLoader('./components/Register.vue')
-const Profile = window.httpVueLoader('./components/Profile.vue')
-const Shop = window.httpVueLoader('./components/Shop.vue')
-const Combat = window.httpVueLoader('./components/Combat.vue')
+const Clients = window.httpVueLoader('./components/Clients.vue')
+const Lifts = window.httpVueLoader('./components/Lifts.vue')
+const Log = window.httpVueLoader('./components/Log.vue')
+const Disconnect = window.httpVueLoader('./components/Disconnect.vue')
+
+
+const Navigation = window.httpVueLoader('./components/Navigation.vue')
 
 const routes = [
   { path: '/', component: Accueil },
   { path: '/login', component: Login },
-  { path: '/register/:error', component: Register, props:true },
-  { path: '/profile', component: Profile },
-  { path: '/shop', component: Shop },
-  { path: '/combat', component: Combat }
+  { path: '/clients', component: Clients, props:true },
+  { path: '/lifts', component: Lifts },
+  { path: '/log', component: Log },
+  { path: '/disconnect', component: Disconnect }
 ]
 
 const router = new VueRouter({
@@ -32,6 +35,9 @@ var app = new Vue({
     },
     items: [],
     zombies: null
+  },
+  components: {
+    Navigation
   },
   async mounted() {
     const res = await axios.get('/api/me') //L'id de l'utilisateur
