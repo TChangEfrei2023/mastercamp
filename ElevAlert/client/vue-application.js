@@ -40,9 +40,10 @@ var app = new Vue({
     Navigation
   },
   async mounted() {
+    
     const res = await axios.get('/api/me') //L'id de l'utilisateur
     this.info.id = res.data
-
+    /*
     const res2 = await axios.get('/api/profile') //Ses infos
     this.info.items = res2.data.items
     this.info.equipped = res2.data.equipped
@@ -60,6 +61,7 @@ var app = new Vue({
       const res4 = await axios.get('/api/zombies') //Zombie
       this.zombies = res4.data
     }
+    */
   },
   methods:{
     async confirmRegister(profile) {
