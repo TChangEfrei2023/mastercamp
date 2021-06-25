@@ -30,6 +30,8 @@
 </script>
 
 <style scoped>
-
+	.navBar {
+		background-color: red;
+	}
 </style>
 

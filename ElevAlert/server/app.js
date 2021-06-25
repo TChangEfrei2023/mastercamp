@@ -18,3 +18,4 @@ app.use(express.static(path.join(__dirname, '../client')))
 app.use('/api/', apiRouter)
 
 module.exports = app
+

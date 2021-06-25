@@ -19,19 +19,28 @@ router.use((req,res,next) => {
   if(!req.session.initialised){
     req.session.initialised = true
     req.session.userId = null
+    req.session.employe = false
     req.session.elevatorId = null
+    req.session.nom = ''
   }
   next()
 })
 
 
 /*  Get the current session's information */
-router.get('/me',(req,res) => {
-  if(typeof(req.session.userId) !== "number") {
-    res.json({ message: "User not connected" })
+router.get('/me',async(req,res) => {
+  if(typeof(req.session.userId) === "number") {
+    res.json({ message : "User successfully connected", id: req.session.userId, employe: req.session.employe, nom: req.session.nom })
     return
   }
-  res.json(req.session.userId)
+
+  if(typeof(req.session.elevatorId) === "number") {
+    res.json({ message : "Elevator successfully connected", id: req.session.elevatorId, employe: req.session.employe })
+    return
+  }
+
+  res.json({ message: "User or elevator not connected." })
+  return
 })
 
 
@@ -178,20 +187,36 @@ router.post('/installation',async(req,res) => {
     found : contains data of the query */
 router.post('/login',async(req,res) => {
   const id = req.body.id
+  const idLogin = parseInt(id.match(/[0-9]+/));
+  const employeLogin = id.match(/[a-zA-Z]+/);
   const password = req.body.password
-
+  var found
   if(typeof(req.session.userId) !== 'number') {
-    const result = await client.query({
-      text:'SELECT * FROM public."Client" WHERE "idClient" = $1;',
-      values:[id]
-    })
-
-    const found = result.rows.find(a => a.idClient == id)
+    if(employeLogin) {
+      const result = await client.query({
+        text:'SELECT * FROM public."Employe" WHERE "idEmploye" = $1;',
+        values:[idLogin]
+      })
+      found = result.rows.find(a => a.idEmploye == id)
+    } else {
+      const result = await client.query({
+        text:'SELECT * FROM public."Client" WHERE "idClient" = $1;',
+        values:[idLogin]
+      })
+      found = result.rows.find(a => a.idClient == id)
+    }
 
     if(found){
       if(await bcrypt.compare(password,found.mdp)) {
-        req.session.userId = found.idClient
+        if(employeLogin){
+          req.session.employe = true
+          req.session.userId = found.idEmploye
+        } else {
+          req.session.userId = found.idClient
+        }
+        req.session.nom = found.nom
         res.json({ message: "Login successful" })
+        return
       } else {
         res.status(400).json({ message: "Wrong password" })
         return
@@ -247,6 +272,7 @@ router.post('/connect',async(req,res) => {
 /*  User tries to disconnect, session's information are erased */
 router.post('/disconnect',(req,res) => {
   req.session.userId = null
+  req.session.employe = false
   req.session.elevatorId = null
   res.send()
 })
@@ -265,15 +291,113 @@ router.put('/error/:errorId',async(req,res) => {
     text:'SELECT * FROM public."Error" WHERE "idError"=$1;',
     values:[errorId]
   })
-
+  
   const found = result.rows.find(a => a.idError == errorId)
   if(found){
-    
+    var date = new Date()
+    var currentUTCDate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), date.getMinutes(), date.getSeconds()))
 
-    res.json({ description: found.description, codeError: found.idError, idElevator: req.session.elevatorId })
+    const newBreakdown = await client.query({
+      text:'INSERT INTO public."Breakdown" ("idError","idElevator","dateDebut", "reception") VALUES ($1, $2, $3, $4);',
+      values:[errorId, req.session.elevatorId, currentUTCDate, false]
+    })
+
+    res.json({ description: found.description, codeError: found.idError, idElevator: req.session.elevatorId, date: currentUTCDate })
     return
   }
   res.status(400).json({ message: 'Error not found.' })
+})
+
+
+/*  The website will regularly send a request to check if a change happened in the table Breakdown.
+    This function sends a list of elevator to client and ElevAlert if breakdown found.
+
+    sqlQuery : flexible query string that changes on type of user (client or employee)
+    queryValue : array of value(s) that complements the sqlQuery
+    
+    result: sqlQuery that search unnotified breakdown
+    found: list of elevators that have an unrepaired breakdown */
+router.put('/notification',async(req,res) => {
+  if(typeof(req.session.userId) !== "number") {
+    res.json({ message: "User not connected" })
+    return
+  }
+
+  var sqlQuery = 'SELECT * FROM public."Breakdown" WHERE "reception" = $1'
+  var queryValue = [false]
+  if(req.session.employe == false){
+    sqlQuery = sqlQuery.concat(' ',' AND "idElevator" IN (SELECT "idElevator" FROM public."Elevator" WHERE "idClient" = $2)')
+    queryValue.push(req.session.userId)
+  }
+  sqlQuery = sqlQuery.concat('',';')
+  
+  const result = await client.query({
+    text:sqlQuery,
+    values:queryValue,
+  })
+  
+  const found = result.rows
+  if(found){
+    res.json({ message:"Breakdown detected !", result: found})
+    return
+  }
+  res.json({ message:"No breakdown detected."})
+  return
+})
+
+
+/*  If the website receives a notification of a breakdown, then it has to confirm that it has been notified.
+    This function will set to true the 'reception' attribute of notified breakdowns.
+
+    sqlQuery : flexible query string that changes on type of user (client or employee)
+    queryValue : array of value(s) that complements the sqlQuery
+    
+    result: sqlQuery that search unnotified breakdown
+    found: list of elevators that have an unrepaired breakdown */
+router.post('/reception/:idBreakdown',async(req,res) => {
+  if(typeof(req.session.userId) !== "number") {
+    res.json({ message: "User not connected" })
+    return
+  }
+
+  const id = req.params.idBreakdown
+  const resultBreakdown = await client.query({
+    text:'SELECT * FROM public."Breakdown" WHERE "idBreakdown"=$1;',
+    values:[id]
+  })
+  const foundBreakdown = resultBreakdown.rows.find(a => a.idBreakdown == id)
+  if(!foundBreakdown){
+    res.json({ message: "Breakdown not found." })
+    return
+  }
+
+  if(foundBreakdown.reception == true){
+    res.json({ message: "Breakdown already notified." })
+    return
+  }
+  
+  if(!req.session.employe) {
+    const resultElevator = await client.query({
+      text:'SELECT * FROM public."Elevator" WHERE "idElevator"=$1;',
+      values:[foundBreakdown.idElevator]
+    })
+    const foundElevator = resultElevator.rows.find(a => a.idElevator == foundBreakdown.idElevator)
+    if(foundElevator){
+      if(req.session.userId != foundElevator.idClient) {
+        res.json({ message: "User is not the owner of the elevator." })
+        return
+      }
+    } else {
+      res.json({ message: "Elevator not found." })
+      return
+    }
+  }
+  const updateBreakdown = await client.query({
+    text:'UPDATE public."Breakdown" SET "reception"=$1 WHERE "idBreakdown" = $2;',
+    values:[true,id]
+  })
+  res.json({ message: "Notification success" })
+  return
 })
 
 module.exports = router
