@@ -30,16 +30,109 @@ router.use((req,res,next) => {
 /*  Get the current session's information */
 router.get('/me',async(req,res) => {
   if(typeof(req.session.userId) === "number") {
+    console.log("YOLO")
     res.json({ message : "User successfully connected", id: req.session.userId, employe: req.session.employe, nom: req.session.nom })
     return
   }
 
   if(typeof(req.session.elevatorId) === "number") {
+    console.log("YOLA")
     res.json({ message : "Elevator successfully connected", id: req.session.elevatorId, employe: req.session.employe })
     return
   }
-
+  console.log("YOLe")
   res.json({ message: "User or elevator not connected." })
+  return
+})
+
+/*  Get elevators list from database */
+router.get('/elevators',async(req,res) => {
+  if(typeof(req.session.userId) !== "number") {
+    res.status(400).json({ message : "User not connected" })
+    return
+  }
+
+  const select = 'SELECT "Elevator"."idElevator", "Client"."nom", "Adresse"."rue", "Adresse"."codePostal", "Adresse"."ville",EXISTS(SELECT DISTINCT "idElevator" FROM "Breakdown" WHERE "Breakdown"."dateFin" IS null AND "Breakdown"."idElevator" = "Elevator"."idElevator") '
+  const from = 'FROM "Elevator", "Client", "Adresse" '
+  const order = 'ORDER BY "Elevator"."idElevator";'
+  var resultElevators
+  if(req.session.employe == true){
+    const where = 'WHERE "Elevator"."idClient" = "Client"."idClient" AND "Elevator"."idAdresse" = "Adresse"."idAdresse" '
+    const query = select+from+where+order
+    resultElevators = await client.query({
+      text:query
+    })
+  } else {
+    const where = 'WHERE "Elevator"."idClient" = "Client"."idClient" AND "Elevator"."idAdresse" = "Adresse"."idAdresse" AND "Elevator"."idClient" = $1 '
+    const query = select+from+where+order
+    resultElevators = await client.query({
+      text:query,
+      values:[req.session.userId]
+    })
+  }
+
+  const foundElevators = resultElevators.rows
+  res.json({ message:"Table received.", content:foundElevators})
+  return
+})
+
+
+/*  Get breakdowns list from database */
+router.get('/breakdowns',async(req,res) => {
+  if(typeof(req.session.userId) !== "number") {
+    res.status(400).json({ message : "User not connected" })
+    return
+  }
+
+  const select = 'SELECT "idBreakdown", "Breakdown"."idElevator", "rue", "codePostal", "ville", "dateDebut", "dateFin" '
+  const from = 'FROM "Breakdown",("Elevator" LEFT JOIN "Adresse" ON "Elevator"."idAdresse" = "Adresse"."idAdresse") AS PA '
+  const order = 'ORDER BY "idBreakdown";'
+  var resultBreakdowns
+  if(req.session.employe == true){
+    const where = 'WHERE "Breakdown"."idElevator" = PA."idElevator" '
+    const query = select+from+where+order
+    resultBreakdowns = await client.query({
+      text:query
+    })
+  } else {
+    const where = 'WHERE "Breakdown"."idElevator" = PA."idElevator" AND PA."idClient" = $1 '
+    const query = select+from+where+order
+    resultBreakdowns = await client.query({
+      text:query,
+      values:[req.session.userId]
+    })
+  }
+
+  const foundBreakdowns= resultBreakdowns.rows
+  res.json({ message:"Table received.", content:foundBreakdowns})
+  return
+})
+
+
+/*  Get clients list from database */
+router.get('/clients',async(req,res) => {
+  if(typeof(req.session.userId) !== "number") {
+    res.status(400).json({ message : "User not connected" })
+    return
+  }
+
+  if(typeof(req.session.employe) == false) {
+    res.status(400).json({ message : "User not an employee" })
+    return
+  }
+
+  const select = 'SELECT "idClient","nom","email","tel", "rue", "codePostal", "ville" '
+  const from = 'FROM "Client","Adresse" '
+  const where = 'WHERE "Client"."idAdresse" = "Adresse"."idAdresse" '
+  const order = 'ORDER BY "idClient";'
+  const query = select+from+where+order
+
+  const resultClients = await client.query({
+    text:query
+  })
+
+  const foundClients= resultClients.rows
+  res.json({ message:"Table received.", content:foundClients})
   return
 })
 
@@ -81,7 +174,7 @@ router.post('/register',async(req,res) => {
   var idAdresse = 0
 
   const resultClient = await client.query({
-    text:'SELECT * FROM public."Client" WHERE "nom"=$1;',
+    text:'SELECT * FROM "Client" WHERE "nom"=$1;',
     values:[nom]
   })
 
@@ -92,7 +185,7 @@ router.post('/register',async(req,res) => {
 
   } else {
     const resultAdresse = await client.query({
-      text:'SELECT * FROM public."Adresse" WHERE "rue"=$1 AND "codePostal"=$2 AND "ville"=$3;',
+      text:'SELECT * FROM "Adresse" WHERE "rue"=$1 AND "codePostal"=$2 AND "ville"=$3;',
       values:[rue,cp,ville]
     })
 
@@ -101,7 +194,7 @@ router.post('/register',async(req,res) => {
       idAdresse = foundAdresse.idAdresse
     } else {
       const newAdresse = await client.query({
-        text:'INSERT INTO public."Adresse" ("rue", "codePostal", "ville") VALUES ($1, $2, $3) RETURNING "idAdresse";',
+        text:'INSERT INTO "Adresse" ("rue", "codePostal", "ville") VALUES ($1, $2, $3) RETURNING "idAdresse";',
         values:[rue,cp,ville]
       })
 
@@ -109,7 +202,7 @@ router.post('/register',async(req,res) => {
     }
     const hash = await bcrypt.hash(password, 10)
     const newClient = await client.query({
-      text:'INSERT INTO public."Client" ("mdp", "nom", "email", "tel", "idAdresse") VALUES ($1, $2, $3, $4, $5);',
+      text:'INSERT INTO "Client" ("mdp", "nom", "email", "tel", "idAdresse") VALUES ($1, $2, $3, $4, $5);',
       values:[hash, nom, email, tel, idAdresse]
     })
 
@@ -146,14 +239,14 @@ router.post('/installation',async(req,res) => {
   var idAdresse = 0
 
   const resultClient = await client.query({
-    text:'SELECT * FROM public."Client" WHERE "idClient"=$1;',
+    text:'SELECT * FROM "Client" WHERE "idClient"=$1;',
     values:[id]
   })
 
   const foundClient = resultClient.rows.find(a => a.idClient == id)
   if(foundClient){
     const resultAdresse = await client.query({
-      text:'SELECT * FROM public."Adresse" WHERE "rue"=$1 AND "codePostal"=$2 AND "ville"=$3;',
+      text:'SELECT * FROM "Adresse" WHERE "rue"=$1 AND "codePostal"=$2 AND "ville"=$3;',
       values:[rue,cp,ville]
     })
     const foundAdresse = resultAdresse.rows.find(a => a.rue == rue)
@@ -161,14 +254,14 @@ router.post('/installation',async(req,res) => {
       idAdresse = foundAdresse.idAdresse
     } else {
       const newAdresse = await client.query({
-        text:'INSERT INTO public."Adresse" ("rue", "codePostal", "ville") VALUES ($1, $2, $3) RETURNING "idAdresse";',
+        text:'INSERT INTO "Adresse" ("rue", "codePostal", "ville") VALUES ($1, $2, $3) RETURNING "idAdresse";',
         values:[rue,cp,ville]
       })
 
       idAdresse = newAdresse.rows[0].idAdresse
     }
     const newElevator = await client.query({
-      text:'INSERT INTO public."Elevator" ("idClient", "idAdresse") VALUES ($1, $2);',
+      text:'INSERT INTO "Elevator" ("idClient", "idAdresse") VALUES ($1, $2);',
       values:[foundClient.idClient,idAdresse]
     })
     res.json({ message: "New elevator successfully installed."})
@@ -192,16 +285,16 @@ router.post('/login',async(req,res) => {
   const password = req.body.password
   var found
   if(typeof(req.session.userId) !== 'number') {
-    if(employeLogin) {
+    if(employeLogin != null) {
       const result = await client.query({
-        text:'SELECT * FROM public."Employe" WHERE "idEmploye" = $1;',
+        text:'SELECT * FROM "Employe" WHERE "idEmploye" = $1;',
         values:[idLogin]
       })
-      found = result.rows.find(a => a.idEmploye == id)
+      found = result.rows.find(a => a.idEmploye == idLogin)
     } else {
       const result = await client.query({
-        text:'SELECT * FROM public."Client" WHERE "idClient" = $1;',
-        values:[idLogin]
+        text:'SELECT * FROM "Client" WHERE "idClient" = $1;',
+        values:[id]
       })
       found = result.rows.find(a => a.idClient == id)
     }
@@ -242,13 +335,13 @@ router.post('/connect',async(req,res) => {
 
   if(typeof(req.session.elevatorId) !== 'number') {
     const resultElevator = await client.query({
-      text:'SELECT * FROM public."Elevator" WHERE "idElevator" = $1;',
+      text:'SELECT * FROM "Elevator" WHERE "idElevator" = $1;',
       values:[id]
     })
     const foundElevator = resultElevator.rows.find(a => a.idElevator == id)
     if(foundElevator){
       const resultClient = await client.query({
-        text:'SELECT * FROM public."Client" WHERE "idClient" = $1;',
+        text:'SELECT * FROM "Client" WHERE "idClient" = $1;',
         values:[foundElevator.idClient]
       })
       const foundClient = resultClient.rows.find(a => a.idClient == foundElevator.idClient)
@@ -270,10 +363,11 @@ router.post('/connect',async(req,res) => {
 })
 
 /*  User tries to disconnect, session's information are erased */
-router.post('/disconnect',(req,res) => {
+router.post('/logout',(req,res) => {
   req.session.userId = null
   req.session.employe = false
   req.session.elevatorId = null
+  req.session.nom = ''
   res.send()
 })
 
@@ -288,7 +382,7 @@ router.put('/error/:errorId',async(req,res) => {
   const errorId = req.params.errorId
   
   const result = await client.query({
-    text:'SELECT * FROM public."Error" WHERE "idError"=$1;',
+    text:'SELECT * FROM "Error" WHERE "idError"=$1;',
     values:[errorId]
   })
   
@@ -298,7 +392,7 @@ router.put('/error/:errorId',async(req,res) => {
     var currentUTCDate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), date.getMinutes(), date.getSeconds()))
 
     const newBreakdown = await client.query({
-      text:'INSERT INTO public."Breakdown" ("idError","idElevator","dateDebut", "reception") VALUES ($1, $2, $3, $4);',
+      text:'INSERT INTO "Breakdown" ("idError","idElevator","dateDebut", "reception") VALUES ($1, $2, $3, $4);',
       values:[errorId, req.session.elevatorId, currentUTCDate, false]
     })
 
@@ -323,10 +417,10 @@ router.put('/notification',async(req,res) => {
     return
   }
 
-  var sqlQuery = 'SELECT * FROM public."Breakdown" WHERE "reception" = $1'
+  var sqlQuery = 'SELECT * FROM "Breakdown" WHERE "reception" = $1'
   var queryValue = [false]
   if(req.session.employe == false){
-    sqlQuery = sqlQuery.concat(' ',' AND "idElevator" IN (SELECT "idElevator" FROM public."Elevator" WHERE "idClient" = $2)')
+    sqlQuery = sqlQuery.concat(' ',' AND "idElevator" IN (SELECT "idElevator" FROM "Elevator" WHERE "idClient" = $2)')
     queryValue.push(req.session.userId)
   }
   sqlQuery = sqlQuery.concat('',';')
@@ -362,7 +456,7 @@ router.post('/reception/:idBreakdown',async(req,res) => {
 
   const id = req.params.idBreakdown
   const resultBreakdown = await client.query({
-    text:'SELECT * FROM public."Breakdown" WHERE "idBreakdown"=$1;',
+    text:'SELECT * FROM "Breakdown" WHERE "idBreakdown"=$1;',
     values:[id]
   })
   const foundBreakdown = resultBreakdown.rows.find(a => a.idBreakdown == id)
@@ -378,7 +472,7 @@ router.post('/reception/:idBreakdown',async(req,res) => {
   
   if(!req.session.employe) {
     const resultElevator = await client.query({
-      text:'SELECT * FROM public."Elevator" WHERE "idElevator"=$1;',
+      text:'SELECT * FROM "Elevator" WHERE "idElevator"=$1;',
       values:[foundBreakdown.idElevator]
     })
     const foundElevator = resultElevator.rows.find(a => a.idElevator == foundBreakdown.idElevator)
@@ -393,7 +487,7 @@ router.post('/reception/:idBreakdown',async(req,res) => {
     }
   }
   const updateBreakdown = await client.query({
-    text:'UPDATE public."Breakdown" SET "reception"=$1 WHERE "idBreakdown" = $2;',
+    text:'UPDATE "Breakdown" SET "reception"=$1 WHERE "idBreakdown" = $2;',
     values:[true,id]
   })
   res.json({ message: "Notification success" })

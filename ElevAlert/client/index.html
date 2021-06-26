@@ -16,20 +16,17 @@
       <div id="centerBar">
         <div id="app">
           <main>
-            <navigation></navigation>
-            <router-view
-              :info="info"
-              :items="items"
-              :zombies="zombies"
-              @confirm-register="confirmRegister"
-              @confirm-login="confirmLogin"
-              @change-gear="changeGear"
-              @buy-gear="buyGear"
-              @combat="combat"
-              @find-zombie="findZombie"
-              @revive="revive"
-              @heal="heal"
-              @disconnect="disconnect">
+            <router-view name='nav'
+              :info='info'
+              @logOut='log-out'
+              @disconnect='disconnect'>
+            </router-view>
+            <router-view name='main'
+              :info='info'
+              :elevators='elevators'
+              :breakdowns='breakdowns'
+              :clients='clients'
+              @connect='connect'>
             </router-view>
           </main>
         </div>

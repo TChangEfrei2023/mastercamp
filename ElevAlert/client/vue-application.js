@@ -1,19 +1,18 @@
 const Accueil = window.httpVueLoader('./components/Accueil.vue')
 const Login = window.httpVueLoader('./components/Login.vue')
 const Clients = window.httpVueLoader('./components/Clients.vue')
-const Lifts = window.httpVueLoader('./components/Lifts.vue')
+const Elevators = window.httpVueLoader('./components/Elevators.vue')
 const Log = window.httpVueLoader('./components/Log.vue')
 const Disconnect = window.httpVueLoader('./components/Disconnect.vue')
 
 const Navigation = window.httpVueLoader('./components/Navigation.vue')
 
 const routes = [
-  { path: '/', component: Accueil },
-  { path: '/login', component: Login },
-  { path: '/clients', component: Clients, props:true },
-  { path: '/lifts', component: Lifts },
-  { path: '/log', component: Log },
-  { path: '/disconnect', component: Disconnect }
+  { path: '/', components: {main: Accueil, nav: Navigation}},
+  { path: '/login', components: {main: Login, nav: Navigation} },
+  { path: '/clients', components: {main: Clients, nav: Navigation} },
+  { path: '/elevators', components: {main: Elevators, nav: Navigation} },
+  { path: '/log', components: {main: Log, nav: Navigation} },
 ]
 
 const router = new VueRouter({
@@ -24,60 +23,46 @@ var app = new Vue({
   router,
   el: '#app',
   data: {
-    info:{
-      id:0,
+    info: {
+      id:null,
       employe:false,
       nom:'',
     },
-  },
-  components: {
-    Navigation
+    elevators: [],
+    breakdowns: [],
+    clients: []
   },
   async mounted() {
-    const res = await axios.get('/api/me') //L'id de l'utilisateur
-    this.info.id = res.data.id
-    this.info.employe = res.data.employe
-    this.info.nom = res.data.nom
-  },
-  methods:{
-    async confirmRegister(profile) {
-      if(await axios.post('/api/register',profile)){
-        router.push({ path:'/login' })
+    const sessionInfo = await axios.get('/api/me')
+    this.info.id = sessionInfo.data.id
+    this.info.employe = sessionInfo.data.employe
+    this.info.nom = sessionInfo.data.nom
+
+    if(typeof(this.info.id) === "number") {
+      const elevatorList = await axios.get('/api/elevators')
+      this.elevators = elevatorList.data.content
+
+      const breakdownList = await axios.get('/api/breakdowns')
+      this.breakdowns = breakdownList.data.content
+
+      if(this.info.employe == true){
+        const clientList = await axios.get('/api/clients')
+        this.clients = clientList.data.content
       }
-    },
-    async confirmLogin(profile) {
-      if(await axios.post('/api/login',profile)) {
+    }
+  },
+  methods: {
+    async connect(credientials) {
+      if(await axios.post('/api/login',credientials)) {
         router.push({ path:'/' })
         location.reload()
       }
-    },
-    async changeGear(itemId) {
-      await axios.put('/api/shop/'+itemId)
-    },
-    async buyGear(itemId) {
-      await axios.post('/api/shop',{itemId:itemId})
-    },
-    async combat(hp) {
-      await axios.post('/api/combat')
-      if(hp<=0){
-        await axios.delete('/api/zdeath')
-      }
-    },
-    async findZombie(zombie) {
-      await axios.put('/api/zfind',{zombie:zombie})
-    },
-    async revive(hp) {
-      await axios.put('/api/death',{hp:hp})
-    },
-    async heal() {
-      await axios.put('/api/heal')
     },
     async disconnect() {
-      if(await axios.post('/api/disconnect')){
-        router.push({ path:'/' })
+      console.log("LAMO")
+      if(await axios.post('/api/logout')){
         location.reload()
       }
-
     }
   }
 })

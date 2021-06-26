@@ -1,6 +1,6 @@
 <template>
 	<div id="acc">
-		
+		HELLO
 	</div>
 </template>
 
@@ -15,7 +15,7 @@
 	  }
 	},
 	mounted() {
-	  //document.body.style="background-image:url('https://wallup.net/wp-content/uploads/2018/10/03/944615-dark-art-artwork-fantasy-artistic-original-psychedelic-horror-evil-creepy-scary-spooky-halloween.jpg'); background-attachment:fixed;"
+	  
 	},
 	computed: {
 	  isLoggedIn: function() {
@@ -28,7 +28,7 @@
 	methods: {
 	  redirectReg() {
 	  	this.$router.push({ path:'/register/0' })
-	  }
+	  },
 	}
   }
 </script>
