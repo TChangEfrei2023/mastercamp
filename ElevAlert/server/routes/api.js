@@ -137,6 +137,51 @@ router.get('/clients',async(req,res) => {
 })
 
 
+/*  The website will regularly send a request to check if a change happened in the table Breakdown.
+    This function sends a list of elevator to client and ElevAlert if breakdown found.
+
+    sqlQuery : flexible query string that changes on type of user (client or employee)
+    queryValue : array of value(s) that complements the sqlQuery
+    
+    result: sqlQuery that search unnotified breakdown
+    found: list of elevators that have an unrepaired breakdown */
+    router.get('/notification',async(req,res) => {
+      if(typeof(req.session.userId) !== "number") {
+        res.json({ message: "User not connected" })
+        return
+      }
+    
+      const select = 'SELECT "idBreakdown","Error"."idError","description","Breakdown"."idElevator","dateDebut","Elevator"."idClient","nom","email","tel","rue","codePostal","ville" '
+      const from = 'FROM "Breakdown","Error","Client","Elevator","Adresse" '
+      const where = 'WHERE "Elevator"."idElevator"="Breakdown"."idElevator" '+
+                    'AND "Breakdown"."idError"="Error"."idError" '+
+                    'AND "Elevator"."idClient"="Client"."idClient" '+
+                    'AND "Adresse"."idAdresse"="Elevator"."idAdresse" '+
+                    'AND "reception" = $1'
+      const order = 'ORDER BY "idBreakdown";'
+      var sqlQuery = select + from + where
+      var queryValue = [false]
+      if(req.session.employe == false){
+        sqlQuery = sqlQuery.concat(' ',' AND "Elevator"."idElevator" IN (SELECT "idElevator" FROM "Elevator" WHERE "idClient" = $2)')
+        queryValue.push(req.session.userId)
+      }
+      sqlQuery = sqlQuery.concat('',order)
+      
+      const result = await client.query({
+        text:sqlQuery,
+        values:queryValue,
+      })
+      
+      const found = result.rows
+      if(found){
+        res.json({ message:"Breakdown detected !", result: found})
+        return
+      }
+      res.json({ message:"No breakdown detected."})
+      return
+    })
+
+
 /*  Employee registers a new client. This route checks if the client already
     exists or not, and checks if his adresse already exists in the Adresse table
     before creating the client.
@@ -400,43 +445,6 @@ router.put('/error/:errorId',async(req,res) => {
     return
   }
   res.status(400).json({ message: 'Error not found.' })
-})
-
-
-/*  The website will regularly send a request to check if a change happened in the table Breakdown.
-    This function sends a list of elevator to client and ElevAlert if breakdown found.
-
-    sqlQuery : flexible query string that changes on type of user (client or employee)
-    queryValue : array of value(s) that complements the sqlQuery
-    
-    result: sqlQuery that search unnotified breakdown
-    found: list of elevators that have an unrepaired breakdown */
-router.put('/notification',async(req,res) => {
-  if(typeof(req.session.userId) !== "number") {
-    res.json({ message: "User not connected" })
-    return
-  }
-
-  var sqlQuery = 'SELECT * FROM "Breakdown" WHERE "reception" = $1'
-  var queryValue = [false]
-  if(req.session.employe == false){
-    sqlQuery = sqlQuery.concat(' ',' AND "idElevator" IN (SELECT "idElevator" FROM "Elevator" WHERE "idClient" = $2)')
-    queryValue.push(req.session.userId)
-  }
-  sqlQuery = sqlQuery.concat('',';')
-  
-  const result = await client.query({
-    text:sqlQuery,
-    values:queryValue,
-  })
-  
-  const found = result.rows
-  if(found){
-    res.json({ message:"Breakdown detected !", result: found})
-    return
-  }
-  res.json({ message:"No breakdown detected."})
-  return
 })
 
 

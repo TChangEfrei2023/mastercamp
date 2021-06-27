@@ -30,7 +30,8 @@ var app = new Vue({
     },
     elevators: [],
     breakdowns: [],
-    clients: []
+    clients: [],
+    notifications: []
   },
   async mounted() {
     const sessionInfo = await axios.get('/api/me')
@@ -44,6 +45,9 @@ var app = new Vue({
 
       const breakdownList = await axios.get('/api/breakdowns')
       this.breakdowns = breakdownList.data.content
+      
+      const notifList = await axios.get('/api/notification')
+      this.notifications = notifList.data.result
 
       if(this.info.employe == true){
         const clientList = await axios.get('/api/clients')
@@ -59,9 +63,19 @@ var app = new Vue({
       }
     },
     async disconnect() {
-      console.log("LAMO")
       if(await axios.post('/api/logout')){
         location.reload()
+      }
+    },
+    async confirmNotification(idBreakdown) {
+      if(await axios.post('/api/reception/'+idBreakdown)){
+        this.notifications.splice(this.notifications.findIndex(a=>a.idBreakdown == idBreakdown),1)
+      }
+    },
+    async checkNewBreakdown(){
+      const notifList = await axios.get('/api/notification')
+      if(notifList){
+        this.notifications = notifList.data.result
       }
     }
   }

@@ -1,6 +1,6 @@
 <template>
 	<div id="acc">
-		HELLO
+		ELEVALERT
 	</div>
 </template>
 

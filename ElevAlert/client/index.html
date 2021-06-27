@@ -18,8 +18,10 @@
           <main>
             <router-view name='nav'
               :info='info'
-              @logOut='log-out'
-              @disconnect='disconnect'>
+              :notifications='notifications'
+              @disconnect='disconnect'
+              @confirm-notification='confirmNotification'
+              @check-new-breakdown="checkNewBreakdown">
             </router-view>
             <router-view name='main'
               :info='info'
