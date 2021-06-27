@@ -1,6 +1,23 @@
 <template>
 	<div id="acc" v-if="isLoggedIn">
 		<h1> Elevator list </h1>
+    <button @click="showForm()"> <span v-if="!visibilityForm">Nouvelle ascenseur</span><span v-else> Annuler </span> </button>
+		<form v-if="visibilityForm">
+			<p> Formulaire nouvelle ascenseur </p>
+			<label> Nom: </label>
+			<input type="text" v-model="form.nom" placeholder="Nom">
+			<label> Email: </label>
+			<input type="text" v-model="form.email" placeholder="Email">
+			<label> Tel: </label>
+			<input type="text" v-model="form.tel" placeholder="Téléphone">
+			<label> Rue: </label>
+			<input type="text" v-model="form.rue" placeholder="Nom rue">
+			<label> Code Postal: </label>
+			<input type="text" v-model="form.codePostal" placeholder="Num code postal">
+			<label> Ville: </label>
+			<input type="text" v-model="form.ville" placeholder="Nom ville">
+			<button @click="addClient()"> Confirmer </button>
+		</form>
     <table class="table mt-5">
       <thead>
         <tr>

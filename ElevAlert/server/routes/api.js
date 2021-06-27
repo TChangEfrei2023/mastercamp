@@ -116,7 +116,7 @@ router.get('/clients',async(req,res) => {
     return
   }
 
-  if(typeof(req.session.employe) == false) {
+  if(req.session.employe == false) {
     res.status(400).json({ message : "User not an employee" })
     return
   }
@@ -145,41 +145,41 @@ router.get('/clients',async(req,res) => {
     
     result: sqlQuery that search unnotified breakdown
     found: list of elevators that have an unrepaired breakdown */
-    router.get('/notification',async(req,res) => {
-      if(typeof(req.session.userId) !== "number") {
-        res.json({ message: "User not connected" })
-        return
-      }
-    
-      const select = 'SELECT "idBreakdown","Error"."idError","description","Breakdown"."idElevator","dateDebut","Elevator"."idClient","nom","email","tel","rue","codePostal","ville" '
-      const from = 'FROM "Breakdown","Error","Client","Elevator","Adresse" '
-      const where = 'WHERE "Elevator"."idElevator"="Breakdown"."idElevator" '+
-                    'AND "Breakdown"."idError"="Error"."idError" '+
-                    'AND "Elevator"."idClient"="Client"."idClient" '+
-                    'AND "Adresse"."idAdresse"="Elevator"."idAdresse" '+
-                    'AND "reception" = $1'
-      const order = 'ORDER BY "idBreakdown";'
-      var sqlQuery = select + from + where
-      var queryValue = [false]
-      if(req.session.employe == false){
-        sqlQuery = sqlQuery.concat(' ',' AND "Elevator"."idElevator" IN (SELECT "idElevator" FROM "Elevator" WHERE "idClient" = $2)')
-        queryValue.push(req.session.userId)
-      }
-      sqlQuery = sqlQuery.concat('',order)
-      
-      const result = await client.query({
-        text:sqlQuery,
-        values:queryValue,
-      })
-      
-      const found = result.rows
-      if(found){
-        res.json({ message:"Breakdown detected !", result: found})
-        return
-      }
-      res.json({ message:"No breakdown detected."})
-      return
-    })
+router.get('/notification',async(req,res) => {
+  if(typeof(req.session.userId) !== "number") {
+    res.json({ message: "User not connected" })
+    return
+  }
+
+  const select = 'SELECT "idBreakdown","Error"."idError","description","Breakdown"."idElevator","dateDebut","Elevator"."idClient","nom","email","tel","rue","codePostal","ville" '
+  const from = 'FROM "Breakdown","Error","Client","Elevator","Adresse" '
+  const where = 'WHERE "Elevator"."idElevator"="Breakdown"."idElevator" '+
+                'AND "Breakdown"."idError"="Error"."idError" '+
+                'AND "Elevator"."idClient"="Client"."idClient" '+
+                'AND "Adresse"."idAdresse"="Elevator"."idAdresse" '+
+                'AND "reception" = $1'
+  const order = 'ORDER BY "idBreakdown";'
+  var sqlQuery = select + from + where
+  var queryValue = [false]
+  if(req.session.employe == false){
+    sqlQuery = sqlQuery.concat(' ',' AND "Elevator"."idElevator" IN (SELECT "idElevator" FROM "Elevator" WHERE "idClient" = $2)')
+    queryValue.push(req.session.userId)
+  }
+  sqlQuery = sqlQuery.concat('',order)
+  
+  const result = await client.query({
+    text:sqlQuery,
+    values:queryValue,
+  })
+  
+  const found = result.rows
+  if(found){
+    res.json({ message:"Breakdown detected !", result: found})
+    return
+  }
+  res.json({ message:"No breakdown detected."})
+  return
+})
 
 
 /*  Employee registers a new client. This route checks if the client already
@@ -191,7 +191,7 @@ router.get('/clients',async(req,res) => {
     email : Email (Must have for alert)
     tel : Client's phone number
 
-    Adresse's var (self-explanatory): rue, cp, ville
+    Adresse's var (self-explanatory): rue, codePostal, ville
 
     idAdresse : Adresse's ID
     
@@ -207,14 +207,33 @@ router.get('/clients',async(req,res) => {
 
     hash : hash password */
 router.post('/register',async(req,res) => {
+  if(typeof(req.session.userId) !== "number") {
+    res.status(400).json({ message : "User not connected" })
+    return
+  }
+
+  if(req.session.employe == false) {
+    res.status(400).json({ message : "User not an employee" })
+    return
+  }
+
   const nom = req.body.nom
-  const password = req.body.password
+  const password = "AZE"
   const email = req.body.email
   const tel = req.body.tel
-  
   const rue = req.body.rue
-  const cp = req.body.cp
+  const codePostal = req.body.codePostal
   const ville = req.body.ville
+
+  if(typeof(nom) !== "string" || nom == ''
+    && typeof(email) !== "string" || email == '' 
+    && typeof(tel) !== "string" || tel == ''
+    && typeof(rue) !== "string" || rue == ''
+    && typeof(codePostal) !== "string" || codePostal == ''
+    && typeof(ville) !== "string" || ville == '') {
+      res.status(400).json({ message : "Missing or invalid field(s)." })
+      return
+  }
 
   var idAdresse = 0
 
@@ -231,7 +250,7 @@ router.post('/register',async(req,res) => {
   } else {
     const resultAdresse = await client.query({
       text:'SELECT * FROM "Adresse" WHERE "rue"=$1 AND "codePostal"=$2 AND "ville"=$3;',
-      values:[rue,cp,ville]
+      values:[rue,codePostal,ville]
     })
 
     const foundAdresse = resultAdresse.rows.find(a => a.rue == rue)
@@ -240,7 +259,7 @@ router.post('/register',async(req,res) => {
     } else {
       const newAdresse = await client.query({
         text:'INSERT INTO "Adresse" ("rue", "codePostal", "ville") VALUES ($1, $2, $3) RETURNING "idAdresse";',
-        values:[rue,cp,ville]
+        values:[rue,codePostal,ville]
       })
 
       idAdresse = newAdresse.rows[0].idAdresse
@@ -261,7 +280,7 @@ router.post('/register',async(req,res) => {
 
     id : Client's ID number
 
-    Adresse's var (self-explanatory): rue, cp, ville
+    Adresse's var (self-explanatory): rue, codePostal, ville
 
     idAdresse : Adresse's ID
     
@@ -275,11 +294,29 @@ router.post('/register',async(req,res) => {
     - Put the ID of the already existing adresse into idAdresse
     - Creates new Adresse and return the new adresse's ID into idAdresse */
 router.post('/installation',async(req,res) => {
+  if(typeof(req.session.userId) !== "number") {
+    res.status(400).json({ message : "User not connected" })
+    return
+  }
+
+  if(req.session.employe == false) {
+    res.status(400).json({ message : "User not an employee" })
+    return
+  }
+
   const id = req.body.id
   
   const rue = req.body.rue
-  const cp = req.body.cp
+  const codePostal = req.body.codePostal
   const ville = req.body.ville
+
+  if(typeof(id) !== "string" || id == ''
+    && typeof(rue) !== "string" || rue == ''
+    && typeof(codePostal) !== "string" || codePostal == ''
+    && typeof(ville) !== "string" || ville == '') {
+      res.status(400).json({ message : "Missing or invalid field(s)." })
+      return
+  }
 
   var idAdresse = 0
 
@@ -292,7 +329,7 @@ router.post('/installation',async(req,res) => {
   if(foundClient){
     const resultAdresse = await client.query({
       text:'SELECT * FROM "Adresse" WHERE "rue"=$1 AND "codePostal"=$2 AND "ville"=$3;',
-      values:[rue,cp,ville]
+      values:[rue,codePostal,ville]
     })
     const foundAdresse = resultAdresse.rows.find(a => a.rue == rue)
     if(foundAdresse){
@@ -300,7 +337,7 @@ router.post('/installation',async(req,res) => {
     } else {
       const newAdresse = await client.query({
         text:'INSERT INTO "Adresse" ("rue", "codePostal", "ville") VALUES ($1, $2, $3) RETURNING "idAdresse";',
-        values:[rue,cp,ville]
+        values:[rue,codePostal,ville]
       })
 
       idAdresse = newAdresse.rows[0].idAdresse
@@ -445,6 +482,7 @@ router.put('/error/:errorId',async(req,res) => {
     return
   }
   res.status(400).json({ message: 'Error not found.' })
+  return
 })
 
 

@@ -77,7 +77,7 @@
 		},
 		formatDate(date) {
 			const newDate = new Date(date)
-			return newDate.getUTCDay()+"/"+newDate.getUTCMonth()+"/"+newDate.getUTCFullYear()+" à "+newDate.getUTCHours()+"h"+newDate.getUTCMinutes()
+			return newDate.getDate()+"/"+newDate.getMonth()+"/"+newDate.getFullYear()
 	  	},
 		disconnect(){
 			this.$emit('disconnect')

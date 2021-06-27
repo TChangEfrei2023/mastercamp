@@ -77,6 +77,19 @@ var app = new Vue({
       if(notifList){
         this.notifications = notifList.data.result
       }
+    },
+    async addClient(form){
+      if(await axios.post('/api/register',form)){
+        const copyForm = {
+          nom:form.nom,
+          email:form.email,
+          tel:form.tel,
+          rue:form.rue,
+          codePostal:form.codePostal,
+          ville:form.ville,
+        }
+        this.clients.push(copyForm)
+      }
     }
   }
 })

@@ -1,28 +1,45 @@
 <template>
-	<div id="acc" v-if="isLoggedIn">
+	<div id="acc" v-if="isLoggedIn && info.employe">
 		<h1> Client list </h1>
-    <table class="table mt-5">
-      <thead>
-        <tr>
-          <th scope="col"> ID Panne </th>
-          <th scope="col"> Nom </th>
-		  <th scope="col"> Email </th>
-		  <th scope="col"> Tel </th>
-          <th scope="col" colspan="3"> Adresse </th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(entry) in clients" :key="entry.idClient">
-          <th scope="row">{{ entry.idClient }}</th>
-          <td>{{ entry.nom }}</td>
-		  <td>{{ entry.email }}</td>
-		  <td>{{ entry.tel }}</td>
-          <td>{{ entry.rue }}</td>
-          <td>{{ entry.codePostal }}</td>
-          <td>{{ entry.ville }}</td>
-        </tr>
-      </tbody>
-    </table>
+		<button @click="showForm()"> <span v-if="!visibilityForm">Nouveau client</span><span v-else> Annuler </span> </button>
+		<form v-if="visibilityForm">
+			<p> Formulaire nouveau client </p>
+			<label> Nom: </label>
+			<input type="text" v-model="form.nom" placeholder="Nom">
+			<label> Email: </label>
+			<input type="text" v-model="form.email" placeholder="Email">
+			<label> Tel: </label>
+			<input type="text" v-model="form.tel" placeholder="Téléphone">
+			<label> Rue: </label>
+			<input type="text" v-model="form.rue" placeholder="Nom rue">
+			<label> Code Postal: </label>
+			<input type="text" v-model="form.codePostal" placeholder="Num code postal">
+			<label> Ville: </label>
+			<input type="text" v-model="form.ville" placeholder="Nom ville">
+			<button @click="addClient()"> Confirmer </button>
+		</form>
+		<table class="table mt-5">
+			<thead>
+				<tr>
+				<th scope="col"> ID Panne </th>
+				<th scope="col"> Nom </th>
+				<th scope="col"> Email </th>
+				<th scope="col"> Tel </th>
+				<th scope="col" colspan="3"> Adresse </th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr v-for="(entry) in clients" :key="entry.idClient">
+				<th scope="row">{{ entry.idClient }}</th>
+				<td>{{ entry.nom }}</td>
+				<td>{{ entry.email }}</td>
+				<td>{{ entry.tel }}</td>
+				<td>{{ entry.rue }}</td>
+				<td>{{ entry.codePostal }}</td>
+				<td>{{ entry.ville }}</td>
+				</tr>
+			</tbody>
+		</table>
 	</div>
 </template>
 
@@ -34,7 +51,15 @@
     },
     data () {
       return {
-        
+		form:{
+		  nom:'',
+		  email:'',
+		  tel:'',
+		  rue:'',
+		  codePostal:'',
+		  ville:''
+		},
+        visibilityForm:false
       }
     },
     computed: {
@@ -46,26 +71,19 @@
       },
     },
     methods: {
-      panneTranslation(panne){
-        if(panne == true){
-          return "Oui"
-        } else {
-          return "Non"
-        }
-      },
-	  formatDate(date) {
-		  const newDate = new Date(date)
-		  return newDate.getUTCDay()+"/"+newDate.getUTCMonth()+"/"+newDate.getUTCFullYear()+" à "+newDate.getUTCHours()+"h"+newDate.getUTCMinutes()
+	  showForm(){
+		if(this.visibilityForm){
+	  	  this.visibilityForm = false
+		} else {
+		  this.visibilityForm = true
+		}
 	  },
-	  isRepaired(attribute) {
-		if(typeof(attribute) !== "number"){
-		  return "En cours de réparation."
-        }
-        return attribute
+	  addClient(){
+		this.$emit('add-client',this.form)
 	  }
     },
     mounted() {
-      if(typeof(this.info.id) !== "number"){
+      if(typeof(this.info.id) !== "number" && this.info.employe != true){
         router.push({ path:'/' })
       }
     },
