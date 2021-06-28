@@ -1,6 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const bcrypt = require('bcrypt')
+const nodemailer = require('nodemailer')
 const { Client } = require('pg')
 
 const client = new Client({
@@ -476,6 +477,47 @@ router.put('/error/:errorId',async(req,res) => {
     const newBreakdown = await client.query({
       text:'INSERT INTO "Breakdown" ("idError","idElevator","dateDebut", "reception") VALUES ($1, $2, $3, $4);',
       values:[errorId, req.session.elevatorId, currentUTCDate, false]
+    })
+
+    const resultClient = await client.query({
+      text:'SELECT "idElevator","Elevator"."idClient","Elevator"."idAdresse","email","tel" FROM "Elevator","Client" WHERE "Client"."idClient" = "Elevator"."idClient" AND "idElevator"=$1',
+      values:[req.session.elevatorId]
+    })
+    const foundClient = resultClient.rows.find(a => a.idElevator == req.session.elevatorId) 
+    
+    const resultAdresse = await client.query({
+      text:'SELECT * FROM "Adresse" WHERE "idAdresse"=$1',
+      values:[foundClient.idAdresse]
+    })
+    const foundAdresse = resultAdresse.rows.find(a => a.idAdresse = foundClient.idAdresse)
+    
+    console.log(foundClient)
+    console.log(foundAdresse)
+    
+    let transport = nodemailer.createTransport({
+      service: "Hotmail",
+      auth: {
+          user: 'elevalert@hotmail.com',
+          pass: 'lolpopo123'
+      }
+    })
+    const adresse = foundAdresse.rue + " " + foundAdresse.codePostal + " " + foundAdresse.ville
+    const text = "Bonjour, nous avons détecté une panne sur votre ascenseur (ID:"+req.session.elevatorId+") se trouvant à l'adresse "+adresse+".\n"
+                  + "La raison de la panne est: "+found.description+" (code d'erreur:"+found.idError+").\n"
+                  + "Veuillez appeler un technicien au plus vite.\n Cordialement,\nElevalert\n\nCe message a été généré automatiquement."
+    const message = {
+      from: 'elevalert@hotmail.com', // Sender address
+      to: 'william.li@efrei.net', // List of recipients
+      subject: 'Panne ascenseur', // Subject line
+      text: text // Plain text body
+    }
+    
+    transport.sendMail(message, function(err, info) {
+      if (err) {
+        console.log(err)
+      } else {
+        console.log(info)
+      }
     })
 
     res.json({ description: found.description, codeError: found.idError, idElevator: req.session.elevatorId, date: currentUTCDate })
