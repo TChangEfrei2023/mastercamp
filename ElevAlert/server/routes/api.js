@@ -31,17 +31,14 @@ router.use((req,res,next) => {
 /*  Get the current session's information */
 router.get('/me',async(req,res) => {
   if(typeof(req.session.userId) === "number") {
-    console.log("YOLO")
     res.json({ message : "User successfully connected", id: req.session.userId, employe: req.session.employe, nom: req.session.nom })
     return
   }
 
   if(typeof(req.session.elevatorId) === "number") {
-    console.log("YOLA")
     res.json({ message : "Elevator successfully connected", id: req.session.elevatorId, employe: req.session.employe })
     return
   }
-  console.log("YOLe")
   res.json({ message: "User or elevator not connected." })
   return
 })
@@ -377,6 +374,56 @@ router.post('/installation',async(req,res) => {
 })
 
 
+/*  An elevator is composed of components that are constantly tested by our service. ------------------------------------------------------------------------------------
+    This route will add a component with its details. */
+router.post('/compose/',async(req,res) => {
+  if(typeof(req.session.userId) !== "number") {
+    res.json({ message: "User not connected" })
+    return
+  }
+
+  const idElevator = req.body.idElevator
+  const idError = req.body.idError
+  const nom = req.body.nom
+  const status = req.body.status
+
+  if(typeof(idElevator) !== "string" || idElevator == ''
+    && typeof(idError) !== "string" || idError == ''
+    && typeof(nom) !== "string" || nom == ''
+    && typeof(status) !== "string" || status == '') {
+      res.status(400).json({ message : "Missing or invalid field(s)." })
+      return
+  }
+
+  const resultBreakdown = await client.query({
+    text:'SELECT * FROM "Breakdown" WHERE "idComponent"=$1 AND "dateFin" IS null;',
+    values:[id]
+  })
+  const foundBreakdown = resultBreakdown.rows.find(a => a.idComponent == id)
+  if(!foundBreakdown){
+    res.json({ message: "Breakdown not found." })
+    return
+  }
+
+  if(foundBreakdown.dateFin != null){
+    res.json({ message: "This breakdown has already been repaired." })
+    return
+  }
+
+  var date = new Date()
+  var currentUTCDate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), date.getMinutes(), date.getSeconds()))
+
+  const updateBreakdown = await client.query({
+    text:'UPDATE "Breakdown" SET "dateFin"=$1 WHERE "idComponent" = $2 AND "idBreakdown" = $3;',
+    values:[currentUTCDate,id,foundBreakdown.idBreakdown]
+  })
+
+  res.json({ message: "Repair success" })
+  return
+})
+    
+
+
 /*  User tries to login from login page. Successful if both password and id checks out.
     id : Client's ID input
     password : Password input
@@ -384,7 +431,6 @@ router.post('/installation',async(req,res) => {
     result : SQL query to check if client exists
     found : contains data of the query */
 router.post('/login',async(req,res) => {
-  console.log(req.body)
   if(req.body == {}){
     res.status(400).json({ message: "Tu m'as rien envoyé gro" })
     return
@@ -505,7 +551,6 @@ router.put('/error/:idComponent',async(req,res) => {
       values:[idComponent]
     })
     const foundCheckDate = resultCheckDate.rows.find(a => a.idComponent == idComponent)
-    console.log(!foundCheckDate)
     if(foundCheckDate){
       res.json({ message: "Breakdown still active." })
       return
@@ -517,6 +562,11 @@ router.put('/error/:idComponent',async(req,res) => {
     const newBreakdown = await client.query({
       text:'INSERT INTO "Breakdown" ("idComponent","dateDebut", "reception") VALUES ($1, $2, $3);',
       values:[idComponent, currentUTCDate, false]
+    })
+
+    const updateComponent = await client.query({
+      text:'UPDATE "Component" SET "status"=$1 WHERE "idComponent"=$2;',
+      values:[false, idComponent]
     })
 
     const resultError = await client.query({
@@ -536,10 +586,7 @@ router.put('/error/:idComponent',async(req,res) => {
       values:[foundClient.idAdresse]
     })
     const foundAdresse = resultAdresse.rows.find(a => a.idAdresse = foundClient.idAdresse)
-    
-    console.log(foundClient)
-    console.log(foundAdresse)
-    
+    /*
     let transport = nodemailer.createTransport({
       service: "Hotmail",
       auth: {
@@ -565,7 +612,7 @@ router.put('/error/:idComponent',async(req,res) => {
         console.log(info)
       }
     })
-
+    */
     res.json({ description: found.description, codeError: found.idError, idElevator: req.session.elevatorId, date: currentUTCDate })
     return
   }
@@ -643,12 +690,7 @@ router.post('/repaired/:idComponent',async(req,res) => {
   })
   const foundBreakdown = resultBreakdown.rows.find(a => a.idComponent == id)
   if(!foundBreakdown){
-    res.json({ message: "Breakdown not found." })
-    return
-  }
-
-  if(foundBreakdown.dateFin != null){
-    res.json({ message: "This breakdown has already been repaired." })
+    res.json({ message: "Breakdown not found or already repaired." })
     return
   }
 
@@ -660,20 +702,29 @@ router.post('/repaired/:idComponent',async(req,res) => {
     values:[currentUTCDate,id,foundBreakdown.idBreakdown]
   })
 
+  const updateComponent = await client.query({
+    text:'UPDATE "Component" SET "status"=$1 WHERE "idComponent"=$2;',
+    values:[true, id]
+  })
+
+
   res.json({ message: "Repair success" })
   return
 })
 
 
-/*  Employee has to be able to change the state of an elevator.
-    This route will help in that regard. */
-router.post('/repaired/:idComponent',async(req,res) => {
+
+
+/*  Elevator has to send an update on his component
+    This route will send a request to update a component's details. */
+router.put('/update/:idComponent',async(req,res) => {
   if(typeof(req.session.elevatorId) !== "number") {
     res.json({ message: "Elevator not connected" })
     return
   }
 
   const id = req.params.idComponent
+
   const resultBreakdown = await client.query({
     text:'SELECT * FROM "Breakdown" WHERE "idComponent"=$1 AND "dateFin" IS null;',
     values:[id]
@@ -700,6 +751,7 @@ router.post('/repaired/:idComponent',async(req,res) => {
   res.json({ message: "Repair success" })
   return
 })
+
 
 
 module.exports = router

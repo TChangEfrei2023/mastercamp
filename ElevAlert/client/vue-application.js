@@ -79,6 +79,8 @@ var app = new Vue({
       const notifList = await axios.get('/api/notification')
       if(notifList){
         this.notifications = notifList.data.result
+        const breakdownList = await axios.get('/api/breakdowns')
+        this.breakdowns = breakdownList.data.content
       }
     },
     async addClient(form){

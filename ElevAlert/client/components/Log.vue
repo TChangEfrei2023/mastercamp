@@ -19,7 +19,7 @@
 				<td>{{ entry.codePostal }}</td>
 				<td>{{ entry.ville }}</td>
 				<td>{{ formatDate(entry.dateDebut) }}</td>
-				<td>{{ isRepaired(entry.dateFin) }} <button v-if="entry.exists == null"> {{ entry.exists }} </button> </td>
+				<td>{{ isRepaired(entry.dateFin) }}  </td>
 				</tr>
 			</tbody>
 		</table>
@@ -51,7 +51,7 @@
         return newDate.getDate()+"/"+newDate.getMonth()+"/"+newDate.getFullYear()
       },
       isRepaired(date) {
-        if(typeof(date) !== "number"){
+        if(typeof(date) !== "string"){
           return "En cours de réparation."
         }
           return this.formatDate(date)

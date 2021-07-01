@@ -1,7 +1,7 @@
 <template>
 	<div id="acc">
 		<p>ELEVALERT</p>
-		<h1>kl</h1>
+		<h1>C'est la fin des pannes</h1>
 	</div>
 </template>
 

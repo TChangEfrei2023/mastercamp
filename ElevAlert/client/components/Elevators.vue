@@ -14,7 +14,29 @@
 			<input type="text" v-model="form.ville" placeholder="Nom ville">
 			<button @click="addElevator()"> Confirmer </button>
 		</form>
-    <table class="table mt-5">
+
+    <table v-if="visibilityForm">
+      <label> Composants: </label>
+      <thead>
+        <tr>
+          <th scope="col"> ID Ascenseur </th>
+          <th scope="col"> ID Erreur </th>
+          <th scope="col"> Nom </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(entry) in elevators" :key="entry.idElevator">
+          <th scope="row">{{ entry.idElevator }}</th>
+          <td v-if="info.employe">{{ entry.nom }}</td>
+          <td>{{ entry.rue }}</td>
+          <td>{{ entry.codePostal }}</td>
+          <td>{{ entry.ville }}</td>
+          <td>{{ panneTranslation(entry.exists) }} </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <table class="table">
       <thead>
         <tr>
           <th scope="col"> ID Ascenseur </th>
@@ -49,7 +71,15 @@
           idClient:'',
           rue:'',
           codePostal:'',
-          ville:''
+          ville:'',
+          components:[]
+        },
+        compoForm:{
+          idElevator:'',
+          idError:'',
+          nom:'',
+          dureeVie:'',
+          status:false
         },
         visibilityForm:false
       }
@@ -79,6 +109,13 @@
       },
       addElevator(){
         this.$emit('add-elevator',this.form)
+        this.form = {
+          idClient:'',
+          rue:'',
+          codePostal:'',
+          ville:'',
+          components:[]
+        }
       }
     },
     mounted() {
