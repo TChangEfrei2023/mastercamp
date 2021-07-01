@@ -50,7 +50,7 @@ router.get('/elevators',async(req,res) => {
     return
   }
 
-  const select = 'SELECT "Elevator"."idElevator", "Client"."nom", "Adresse"."rue", "Adresse"."codePostal", "Adresse"."ville",EXISTS(SELECT DISTINCT "idElevator" FROM "Breakdown","Component" WHERE "Breakdown"."idComponent" = "Component"."idComponent" AND "Breakdown"."dateFin" IS null) '
+  const select = 'SELECT "Elevator"."idElevator", "Client"."nom", "Adresse"."rue", "Adresse"."codePostal", "Adresse"."ville" '
   const from = 'FROM "Elevator", "Client", "Adresse" '
   const order = 'ORDER BY "Elevator"."idElevator";'
   var resultElevators
@@ -68,9 +68,24 @@ router.get('/elevators',async(req,res) => {
       values:[req.session.userId]
     })
   }
-
   const foundElevators = resultElevators.rows
-  res.json({ message:"Table received.", content:foundElevators})
+  if(foundElevators) {
+    const resultBrokenElevators = await client.query({
+      text:'SELECT DISTINCT "idElevator" FROM "Breakdown","Component" WHERE "Breakdown"."idComponent" = "Component"."idComponent" AND "Breakdown"."dateFin" IS null',
+    })
+    const foundBrokenElevators = resultBrokenElevators.rows
+    for(var x of foundElevators){
+      var verifyPresence = foundBrokenElevators.find(a => a.idElevator == x.idElevator)
+      if(verifyPresence){
+        x.exists = true
+      } else {
+        x.exists = false
+      }
+    }
+    res.json({ message:"Table received.", content:foundElevators})
+    return
+  }
+  res.json({ message:"No elevator"})
   return
 })
 
@@ -246,11 +261,11 @@ router.post('/register',async(req,res) => {
   const ville = req.body.ville
 
   if(typeof(nom) !== "string" || nom == ''
-    && typeof(email) !== "string" || email == '' 
-    && typeof(tel) !== "string" || tel == ''
-    && typeof(rue) !== "string" || rue == ''
-    && typeof(codePostal) !== "string" || codePostal == ''
-    && typeof(ville) !== "string" || ville == '') {
+    || typeof(email) !== "string" || email == '' 
+    || typeof(tel) !== "string" || tel == ''
+    || typeof(rue) !== "string" || rue == ''
+    || typeof(codePostal) !== "string" || codePostal == ''
+    || typeof(ville) !== "string" || ville == '') {
       res.status(400).json({ message : "Missing or invalid field(s)." })
       return
   }
@@ -329,15 +344,17 @@ router.post('/installation',async(req,res) => {
   const rue = req.body.rue
   const codePostal = req.body.codePostal
   const ville = req.body.ville
+  const components = req.body.components
 
   if(typeof(id) !== "string" || id == ''
-    && typeof(rue) !== "string" || rue == ''
-    && typeof(codePostal) !== "string" || codePostal == ''
-    && typeof(ville) !== "string" || ville == '') {
+    || typeof(rue) !== "string" || rue == ''
+    || typeof(codePostal) !== "string" || codePostal == ''
+    || typeof(ville) !== "string" || ville == ''
+    || components[0] == undefined) {
       res.status(400).json({ message : "Missing or invalid field(s)." })
       return
   }
-
+  
   var idAdresse = 0
 
   const resultClient = await client.query({
@@ -362,15 +379,25 @@ router.post('/installation',async(req,res) => {
 
       idAdresse = newAdresse.rows[0].idAdresse
     }
+
     const newElevator = await client.query({
-      text:'INSERT INTO "Elevator" ("idClient", "idAdresse") VALUES ($1, $2);',
+      text:'INSERT INTO "Elevator" ("idClient", "idAdresse") VALUES ($1, $2) RETURNING "idElevator";',
       values:[foundClient.idClient,idAdresse]
     })
+    const newElevatorId = newElevator.rows[0].idElevator
+    for(var x of components){
+      const newComponent = await client.query({
+        text:'INSERT INTO "Component" ("idElevator", "idError", "nom","status") VALUES ($1, $2, $3, $4);',
+        values:[newElevatorId,x.idError,x.nom,true]
+      })
+    }
     res.json({ message: "New elevator successfully installed."})
     return
   } else {
     res.status(400).json({ message: "Client not found."})
   }
+  
+  
 })
 
 
@@ -388,9 +415,9 @@ router.post('/compose/',async(req,res) => {
   const status = req.body.status
 
   if(typeof(idElevator) !== "string" || idElevator == ''
-    && typeof(idError) !== "string" || idError == ''
-    && typeof(nom) !== "string" || nom == ''
-    && typeof(status) !== "string" || status == '') {
+    || typeof(idError) !== "string" || idError == ''
+    || typeof(nom) !== "string" || nom == ''
+    || typeof(status) !== "string" || status == '') {
       res.status(400).json({ message : "Missing or invalid field(s)." })
       return
   }

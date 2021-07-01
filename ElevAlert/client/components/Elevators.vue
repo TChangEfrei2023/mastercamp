@@ -2,8 +2,9 @@
 	<div id="acc" v-if="isLoggedIn">
 		<h1> Elevator list </h1>
     <button @click="showForm()"> <span v-if="!visibilityForm">Nouvelle ascenseur</span><span v-else> Annuler </span> </button>
+    <button @click="showCompoForm()" v-if="!visibilityForm"> <span v-if="!visibilityCompoForm">Nouveau composant</span><span v-else> Annuler </span> </button>
 		<form v-if="visibilityForm">
-			<p> Formulaire nouvelle ascenseur </p>
+			<h3> Formulaire nouvelle ascenseur </h3>
 			<label> ID Client: </label>
 			<input type="text" v-model="form.idClient" placeholder="ID Client">
 			<label> Rue: </label>
@@ -15,23 +16,32 @@
 			<button @click="addElevator()"> Confirmer </button>
 		</form>
 
-    <table v-if="visibilityForm">
-      <label> Composants: </label>
+    <form v-if="visibilityForm || visibilityCompoForm">
+			<h3> Formulaire nouveau composant </h3>
+			<label v-if="!visibilityForm"> ID Ascenseur: </label>
+			<input v-if="!visibilityForm" type="text" v-model="compoForm.idElevator" placeholder="ID Ascenseur">
+			<label> ID Erreur: </label>
+			<input type="text" v-model="compoForm.idError" placeholder="Code d'erreur">
+			<label> Nom: </label>
+			<input type="text" v-model="compoForm.nom" placeholder="Nom du composant">
+			<button @click="insertComponent()"> + </button>
+		</form>
+
+    <h2 v-if="visibilityCompoForm && visibilityForm"> Composants: </h2>
+    <table v-if="visibilityCompoForm && visibilityForm">
       <thead>
         <tr>
-          <th scope="col"> ID Ascenseur </th>
+          <th scope="col" v-if="!visibilityForm"> ID Ascenseur </th>
           <th scope="col"> ID Erreur </th>
           <th scope="col"> Nom </th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(entry) in elevators" :key="entry.idElevator">
-          <th scope="row">{{ entry.idElevator }}</th>
-          <td v-if="info.employe">{{ entry.nom }}</td>
-          <td>{{ entry.rue }}</td>
-          <td>{{ entry.codePostal }}</td>
-          <td>{{ entry.ville }}</td>
-          <td>{{ panneTranslation(entry.exists) }} </td>
+        <tr v-for="(entry) in form.components" :key="entry.idElevator">
+          <td v-if="!visibilityForm">{{ entry.idElevator }}</td>
+          <td>{{ entry.idError }}</td>
+          <td>{{ entry.nom }}</td>
+          <td class="no"><button @click="deleteComponent(entry.id)"> X </button></td>
         </tr>
       </tbody>
     </table>
@@ -75,13 +85,14 @@
           components:[]
         },
         compoForm:{
+          id:0,
           idElevator:'',
           idError:'',
-          nom:'',
-          dureeVie:'',
-          status:false
+          nom:''
         },
-        visibilityForm:false
+        visibilityForm:false,
+        visibilityCompoForm:false,
+        idCpt:0
       }
     },
     computed: {
@@ -103,18 +114,57 @@
       showForm(){
         if(this.visibilityForm){
               this.visibilityForm = false
+              this.visibilityCompoForm = false
+              this.resetFields()
         } else {
           this.visibilityForm = true
+          this.visibilityCompoForm = true
+        }
+      },
+      showCompoForm(){
+        if(this.visibilityCompoForm){
+          this.visibilityCompoForm = false
+          this.resetFields()
+        } else {
+          this.visibilityCompoForm = true
         }
       },
       addElevator(){
         this.$emit('add-elevator',this.form)
+        this.resetFields()
+      },
+      insertComponent(){
+        var formCopy = {
+          id:this.compoForm.id,
+          idElevator:this.compoForm.idElevator,
+          idError:this.compoForm.idError,
+          nom:this.compoForm.nom
+        }
+
+        this.form.components.push(formCopy)
+        this.idCpt++
+        this.compoForm = {
+          id:this.idCpt,
+          idElevator:'',
+          idError:'',
+          nom:''
+        }
+      },
+      deleteComponent(id){
+        this.form.components.splice(this.form.components.findIndex(x=>x.id == id),1)
+      },
+      resetFields(){
         this.form = {
           idClient:'',
           rue:'',
           codePostal:'',
           ville:'',
           components:[]
+        }
+        this.compoForm = {
+          idElevator:'',
+          idError:'',
+          nom:''
         }
       }
     },
@@ -127,6 +177,9 @@
 </script>
 
 <style scoped>
+.no {
+  border:none;
+}
 table,
 td {
     font-size: 150%;
