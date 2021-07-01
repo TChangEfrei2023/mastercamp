@@ -4,37 +4,33 @@
     <button @click="showForm()"> <span v-if="!visibilityForm">Nouvelle ascenseur</span><span v-else> Annuler </span> </button>
 		<form v-if="visibilityForm">
 			<p> Formulaire nouvelle ascenseur </p>
-			<label> Nom: </label>
-			<input type="text" v-model="form.nom" placeholder="Nom">
-			<label> Email: </label>
-			<input type="text" v-model="form.email" placeholder="Email">
-			<label> Tel: </label>
-			<input type="text" v-model="form.tel" placeholder="Téléphone">
+			<label> ID Client: </label>
+			<input type="text" v-model="form.idClient" placeholder="ID Client">
 			<label> Rue: </label>
 			<input type="text" v-model="form.rue" placeholder="Nom rue">
 			<label> Code Postal: </label>
 			<input type="text" v-model="form.codePostal" placeholder="Num code postal">
 			<label> Ville: </label>
 			<input type="text" v-model="form.ville" placeholder="Nom ville">
-			<button @click="addClient()"> Confirmer </button>
+			<button @click="addElevator()"> Confirmer </button>
 		</form>
     <table class="table mt-5">
       <thead>
         <tr>
           <th scope="col"> ID Ascenseur </th>
-          <th scope="col"> Nom </th>
+          <th scope="col" v-if="info.employe"> Entreprise </th>
           <th scope="col" colspan="3"> Adresse </th>
-          <th scope="col"> Panne </th>
+          <th scope="col"> Status </th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="(entry) in elevators" :key="entry.idElevator">
           <th scope="row">{{ entry.idElevator }}</th>
-          <td>{{ entry.nom }}</td>
+          <td v-if="info.employe">{{ entry.nom }}</td>
           <td>{{ entry.rue }}</td>
           <td>{{ entry.codePostal }}</td>
           <td>{{ entry.ville }}</td>
-          <td>{{ panneTranslation(entry.exists) }}</td>
+          <td>{{ panneTranslation(entry.exists) }} </td>
         </tr>
       </tbody>
     </table>
@@ -49,7 +45,13 @@
     },
     data () {
       return {
-        
+        form:{
+          idClient:'',
+          rue:'',
+          codePostal:'',
+          ville:''
+        },
+        visibilityForm:false
       }
     },
     computed: {
@@ -63,11 +65,21 @@
     methods: {
       panneTranslation(panne){
         if(panne == true){
-          return "Oui"
+          return "En panne"
         } else {
-          return "Non"
+          return "Fonctionnel"
         }
       },
+      showForm(){
+        if(this.visibilityForm){
+              this.visibilityForm = false
+        } else {
+          this.visibilityForm = true
+        }
+      },
+      addElevator(){
+        this.$emit('add-elevator',this.form)
+      }
     },
     mounted() {
       if(typeof(this.info.id) !== "number"){

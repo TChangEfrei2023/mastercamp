@@ -5,7 +5,7 @@
         <h2> Identification </h2>
         <form>
           <label> Identifiant : </label>
-          <input type="text" v-model="credentials.id" placeholder="Identifiant" required>
+          <input type="text" v-model="credentials.idClient" placeholder="Identifiant" required>
           <label> Mot de passe : </label>
           <input type="text" v-model="credentials.password" placeholder="Mot de passe" required>
           <button @click="connect()">Connexion</button>
@@ -24,7 +24,7 @@ module.exports = {
   data () {
     return {
       credentials:{
-        id:'',
+        idClient:'',
         password:''
       }
     }

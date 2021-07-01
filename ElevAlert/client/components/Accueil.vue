@@ -1,6 +1,7 @@
 <template>
 	<div id="acc">
-		ELEVALERT
+		<p>ELEVALERT</p>
+		<h1>kl</h1>
 	</div>
 </template>
 

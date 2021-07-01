@@ -53,7 +53,7 @@ router.get('/elevators',async(req,res) => {
     return
   }
 
-  const select = 'SELECT "Elevator"."idElevator", "Client"."nom", "Adresse"."rue", "Adresse"."codePostal", "Adresse"."ville",EXISTS(SELECT DISTINCT "idElevator" FROM "Breakdown" WHERE "Breakdown"."dateFin" IS null AND "Breakdown"."idElevator" = "Elevator"."idElevator") '
+  const select = 'SELECT "Elevator"."idElevator", "Client"."nom", "Adresse"."rue", "Adresse"."codePostal", "Adresse"."ville",EXISTS(SELECT DISTINCT "idElevator" FROM "Breakdown","Component" WHERE "Breakdown"."idComponent" = "Component"."idComponent" AND "Breakdown"."dateFin" IS null) '
   const from = 'FROM "Elevator", "Client", "Adresse" '
   const order = 'ORDER BY "Elevator"."idElevator";'
   var resultElevators
@@ -78,6 +78,7 @@ router.get('/elevators',async(req,res) => {
 })
 
 
+
 /*  Get breakdowns list from database */
 router.get('/breakdowns',async(req,res) => {
   if(typeof(req.session.userId) !== "number") {
@@ -85,18 +86,18 @@ router.get('/breakdowns',async(req,res) => {
     return
   }
 
-  const select = 'SELECT "idBreakdown", "Breakdown"."idElevator", "rue", "codePostal", "ville", "dateDebut", "dateFin" '
-  const from = 'FROM "Breakdown",("Elevator" LEFT JOIN "Adresse" ON "Elevator"."idAdresse" = "Adresse"."idAdresse") AS PA '
+  const select = 'SELECT "idBreakdown","Component"."idComponent","Component"."idElevator", "rue", "codePostal", "ville", "dateDebut", "dateFin"  '
+  const from = 'FROM "Breakdown","Component",("Elevator" LEFT JOIN "Adresse" ON "Elevator"."idAdresse" = "Adresse"."idAdresse") AS PA '
+  const where = 'WHERE "Breakdown"."idComponent"="Component"."idComponent" AND PA."idElevator" = "Component"."idElevator" '
   const order = 'ORDER BY "idBreakdown";'
   var resultBreakdowns
   if(req.session.employe == true){
-    const where = 'WHERE "Breakdown"."idElevator" = PA."idElevator" '
     const query = select+from+where+order
     resultBreakdowns = await client.query({
       text:query
     })
   } else {
-    const where = 'WHERE "Breakdown"."idElevator" = PA."idElevator" AND PA."idClient" = $1 '
+    where = where.concat('',' AND "Component"."idElevator" = $1 ')
     const query = select+from+where+order
     resultBreakdowns = await client.query({
       text:query,
@@ -137,6 +138,24 @@ router.get('/clients',async(req,res) => {
   return
 })
 
+/*  Get clients list from database */
+router.get('/components',async(req,res) => {
+  if(typeof(req.session.elevatorId) !== "number") {
+    res.status(400).json({ message : "User not connected" })
+    return
+  }
+
+  const query = 'SELECT * FROM "Component" WHERE "idElevator" = $1 ORDER BY "idComponent";'
+
+  const result = await client.query({
+    text:query,
+    values:[req.session.elevatorId]
+  })
+
+  const found= result.rows
+  res.json({ message:"Table received.", content:found})
+  return
+})
 
 /*  The website will regularly send a request to check if a change happened in the table Breakdown.
     This function sends a list of elevator to client and ElevAlert if breakdown found.
@@ -152,11 +171,12 @@ router.get('/notification',async(req,res) => {
     return
   }
 
-  const select = 'SELECT "idBreakdown","Error"."idError","description","Breakdown"."idElevator","dateDebut","Elevator"."idClient","nom","email","tel","rue","codePostal","ville" '
-  const from = 'FROM "Breakdown","Error","Client","Elevator","Adresse" '
-  const where = 'WHERE "Elevator"."idElevator"="Breakdown"."idElevator" '+
-                'AND "Breakdown"."idError"="Error"."idError" '+
-                'AND "Elevator"."idClient"="Client"."idClient" '+
+  const select = 'SELECT "idBreakdown","Component"."idError","description","Component"."idElevator","dateDebut","Elevator"."idClient","Client"."nom","email","tel","rue","codePostal","ville" '
+  const from = 'FROM "Breakdown","Error","Client","Elevator","Adresse","Component" '
+  const where = 'WHERE "Elevator"."idElevator"="Component"."idElevator" '+
+                'AND "Breakdown"."idComponent" = "Component"."idComponent" '+
+                'AND "Component"."idError"="Error"."idError" '+
+                'AND "Elevator"."idClient"="Client"."idClient"  '+
                 'AND "Adresse"."idAdresse"="Elevator"."idAdresse" '+
                 'AND "reception" = $1'
   const order = 'ORDER BY "idBreakdown";'
@@ -181,6 +201,8 @@ router.get('/notification',async(req,res) => {
   res.json({ message:"No breakdown detected."})
   return
 })
+
+
 
 
 /*  Employee registers a new client. This route checks if the client already
@@ -305,7 +327,7 @@ router.post('/installation',async(req,res) => {
     return
   }
 
-  const id = req.body.id
+  const id = req.body.idClient
   
   const rue = req.body.rue
   const codePostal = req.body.codePostal
@@ -362,10 +384,16 @@ router.post('/installation',async(req,res) => {
     result : SQL query to check if client exists
     found : contains data of the query */
 router.post('/login',async(req,res) => {
-  const id = req.body.id
+  console.log(req.body)
+  if(req.body == {}){
+    res.status(400).json({ message: "Tu m'as rien envoyé gro" })
+    return
+  }
+  const id = req.body.idClient
   const idLogin = parseInt(id.match(/[0-9]+/));
   const employeLogin = id.match(/[a-zA-Z]+/);
   const password = req.body.password
+
   var found
   if(typeof(req.session.userId) !== 'number') {
     if(employeLogin != null) {
@@ -391,7 +419,7 @@ router.post('/login',async(req,res) => {
           req.session.userId = found.idClient
         }
         req.session.nom = found.nom
-        res.json({ message: "Login successful" })
+        res.json({ message: "Login successful", id:req.session.userId })
         return
       } else {
         res.status(400).json({ message: "Wrong password" })
@@ -413,7 +441,7 @@ router.post('/login',async(req,res) => {
     password : Password from Elevator's client account
     found : contains the result of the SQL request */
 router.post('/connect',async(req,res) => {
-  const id = req.body.id
+  const id = req.body.idElevator
   const password = req.body.password
 
   if(typeof(req.session.elevatorId) !== 'number') {
@@ -457,27 +485,45 @@ router.post('/logout',(req,res) => {
 /*  Elevator sends an error to server, which creates a new breakdown :
     elevatorId : Elevator's session ID
     errorId : Error code */
-router.put('/error/:errorId',async(req,res) => {
+router.put('/error/:idComponent',async(req,res) => {
   if(typeof(req.session.elevatorId) !== "number") {
     res.json({ message: "Elevator not connected" })
     return
   }
-  const errorId = req.params.errorId
+  const idComponent = req.params.idComponent
   
+
   const result = await client.query({
-    text:'SELECT * FROM "Error" WHERE "idError"=$1;',
-    values:[errorId]
+    text:'SELECT * FROM "Component" WHERE "idComponent"=$1 AND "idElevator" = $2;',
+    values:[idComponent,req.session.elevatorId]
   })
-  
-  const found = result.rows.find(a => a.idError == errorId)
+  const found = result.rows.find(a => a.idComponent == idComponent)
   if(found){
+
+    const resultCheckDate = await client.query({
+      text:'SELECT * FROM "Breakdown" WHERE "idComponent"=$1 AND "dateFin" IS null;',
+      values:[idComponent]
+    })
+    const foundCheckDate = resultCheckDate.rows.find(a => a.idComponent == idComponent)
+    console.log(!foundCheckDate)
+    if(foundCheckDate){
+      res.json({ message: "Breakdown still active." })
+      return
+    }
+
     var date = new Date()
     var currentUTCDate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), date.getMinutes(), date.getSeconds()))
-
+    
     const newBreakdown = await client.query({
-      text:'INSERT INTO "Breakdown" ("idError","idElevator","dateDebut", "reception") VALUES ($1, $2, $3, $4);',
-      values:[errorId, req.session.elevatorId, currentUTCDate, false]
+      text:'INSERT INTO "Breakdown" ("idComponent","dateDebut", "reception") VALUES ($1, $2, $3);',
+      values:[idComponent, currentUTCDate, false]
     })
+
+    const resultError = await client.query({
+      text:'SELECT * FROM "Error" WHERE "idError"=$1',
+      values:[found.idError]
+    })
+    const foundError = resultError.rows.find(a => a.idError == found.idError)
 
     const resultClient = await client.query({
       text:'SELECT "idElevator","Elevator"."idClient","Elevator"."idAdresse","email","tel" FROM "Elevator","Client" WHERE "Client"."idClient" = "Elevator"."idClient" AND "idElevator"=$1',
@@ -502,12 +548,12 @@ router.put('/error/:errorId',async(req,res) => {
       }
     })
     const adresse = foundAdresse.rue + " " + foundAdresse.codePostal + " " + foundAdresse.ville
-    const text = "Bonjour, nous avons détecté une panne sur votre ascenseur (ID:"+req.session.elevatorId+") se trouvant à l'adresse "+adresse+".\n"
-                  + "La raison de la panne est: "+found.description+" (code d'erreur:"+found.idError+").\n"
-                  + "Veuillez appeler un technicien au plus vite.\n Cordialement,\nElevalert\n\nCe message a été généré automatiquement."
+    const text = "Bonjour, nous avons détecté une panne sur votre ascenseur (ID: "+req.session.elevatorId+") se trouvant à l'adresse "+adresse+".\n"
+                  + "La raison de la panne est: "+foundError.description+" (code d'erreur: "+foundError.idError+").\n"
+                  + "Veuillez appeler un technicien au plus vite.\nCordialement,\nElevalert\n\nCe message a été généré automatiquement."
     const message = {
       from: 'elevalert@hotmail.com', // Sender address
-      to: 'william.li@efrei.net', // List of recipients
+      to: foundClient.email, // List of recipients
       subject: 'Panne ascenseur', // Subject line
       text: text // Plain text body
     }
@@ -523,7 +569,7 @@ router.put('/error/:errorId',async(req,res) => {
     res.json({ description: found.description, codeError: found.idError, idElevator: req.session.elevatorId, date: currentUTCDate })
     return
   }
-  res.status(400).json({ message: 'Error not found.' })
+  res.status(400).json({ message: 'Component or elevator not found.' })
   return
 })
 
@@ -581,5 +627,79 @@ router.post('/reception/:idBreakdown',async(req,res) => {
   res.json({ message: "Notification success" })
   return
 })
+
+/*  Employee has to be able to change the state of an elevator.
+    This route will help in that regard. */
+router.post('/repaired/:idComponent',async(req,res) => {
+  if(typeof(req.session.elevatorId) !== "number") {
+    res.json({ message: "Elevator not connected" })
+    return
+  }
+
+  const id = req.params.idComponent
+  const resultBreakdown = await client.query({
+    text:'SELECT * FROM "Breakdown" WHERE "idComponent"=$1 AND "dateFin" IS null;',
+    values:[id]
+  })
+  const foundBreakdown = resultBreakdown.rows.find(a => a.idComponent == id)
+  if(!foundBreakdown){
+    res.json({ message: "Breakdown not found." })
+    return
+  }
+
+  if(foundBreakdown.dateFin != null){
+    res.json({ message: "This breakdown has already been repaired." })
+    return
+  }
+
+  var date = new Date()
+  var currentUTCDate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), date.getMinutes(), date.getSeconds()))
+
+  const updateBreakdown = await client.query({
+    text:'UPDATE "Breakdown" SET "dateFin"=$1 WHERE "idComponent" = $2 AND "idBreakdown" = $3;',
+    values:[currentUTCDate,id,foundBreakdown.idBreakdown]
+  })
+
+  res.json({ message: "Repair success" })
+  return
+})
+
+
+/*  Employee has to be able to change the state of an elevator.
+    This route will help in that regard. */
+router.post('/repaired/:idComponent',async(req,res) => {
+  if(typeof(req.session.elevatorId) !== "number") {
+    res.json({ message: "Elevator not connected" })
+    return
+  }
+
+  const id = req.params.idComponent
+  const resultBreakdown = await client.query({
+    text:'SELECT * FROM "Breakdown" WHERE "idComponent"=$1 AND "dateFin" IS null;',
+    values:[id]
+  })
+  const foundBreakdown = resultBreakdown.rows.find(a => a.idComponent == id)
+  if(!foundBreakdown){
+    res.json({ message: "Breakdown not found." })
+    return
+  }
+
+  if(foundBreakdown.dateFin != null){
+    res.json({ message: "This breakdown has already been repaired." })
+    return
+  }
+
+  var date = new Date()
+  var currentUTCDate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), date.getMinutes(), date.getSeconds()))
+
+  const updateBreakdown = await client.query({
+    text:'UPDATE "Breakdown" SET "dateFin"=$1 WHERE "idComponent" = $2 AND "idBreakdown" = $3;',
+    values:[currentUTCDate,id,foundBreakdown.idBreakdown]
+  })
+
+  res.json({ message: "Repair success" })
+  return
+})
+
 
 module.exports = router

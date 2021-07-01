@@ -40,6 +40,7 @@ var app = new Vue({
     this.info.nom = sessionInfo.data.nom
 
     if(typeof(this.info.id) === "number") {
+
       const elevatorList = await axios.get('/api/elevators')
       this.elevators = elevatorList.data.content
 
@@ -53,6 +54,8 @@ var app = new Vue({
         const clientList = await axios.get('/api/clients')
         this.clients = clientList.data.content
       }
+
+      setInterval(this.checkNewBreakdown,30000)
     }
   },
   methods: {
@@ -80,15 +83,18 @@ var app = new Vue({
     },
     async addClient(form){
       if(await axios.post('/api/register',form)){
-        const copyForm = {
-          nom:form.nom,
-          email:form.email,
-          tel:form.tel,
-          rue:form.rue,
-          codePostal:form.codePostal,
-          ville:form.ville,
+        if(this.info.employe == true){
+          const clientList = await axios.get('/api/clients')
+          this.clients = clientList.data.content
         }
-        this.clients.push(copyForm)
+      }
+    },
+    async addElevator(form){
+      if(await axios.post('/api/installation',form)){
+        if(this.info.employe == true){
+          const elevatorList = await axios.get('/api/elevators')
+          this.elevators = elevatorList.data.content
+        }
       }
     }
   }

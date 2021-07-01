@@ -1,7 +1,7 @@
 <template>
 	<div>
       	<header>
-			<div class=notifBox v-if="hidden && isLoggedIn">
+			<div class=notifBox v-if="!hidden && isLoggedIn">
 				<p v-if="notifications[0] == null" class="announcement"> Aucune notification. </p>
 				<div v-else>
 					<p class="announcement"> Nouvelles pannes détectées ! </p> 
@@ -25,9 +25,9 @@
 				<router-link to='/clients' class="navButton" v-if="isLoggedIn && isEmployee"> Mes clients </router-link>
 				<router-link to='/elevators' class="navButton" v-if="isLoggedIn"> Ascenseurs </router-link>
 				<router-link to='/log' class="navButton" v-if="isLoggedIn"> Log </router-link>
-				<button @click="disconnect()" class="navButton" v-if="isLoggedIn">  Se déconnecter </button>
 				<span id="user"> {{ getPrivilege() }} {{ info.nom }}</span>
 				<button id="notifBtn" @click="showHide()" v-if="isLoggedIn"> Notif </button>
+				<button @click="disconnect()" class="navButton" v-if="isLoggedIn">  Se déconnecter </button>
 			</nav>
 	    </header>
 	</div>
@@ -89,9 +89,6 @@
 			console.log("Checking...")
 			this.$emit('check-new-breakdown')
 		}
-	},
-	mounted() {
-		setInterval(this.checkNewBreakdown,60000)
 	}
   }
 </script>
@@ -108,6 +105,7 @@
 
 	.navBar {
 		background-color: skyblue;
+		height:5%;
 	}
 
 	.notifBox {
@@ -115,7 +113,7 @@
 		background-color:lightgray;
 		position:absolute;
 		z-index: 0;
-		left:68%;
+		right:1;
 	}
 
 	.breakdownBox {
@@ -127,6 +125,13 @@
 
 	.announcement {
 		text-align: center;
+	}
+
+	.navButton {
+		border-radius:5px;
+		border:1px solid black;
+		margin:5px;
+		padding:5px;
 	}
 </style>
 

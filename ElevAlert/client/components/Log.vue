@@ -4,7 +4,7 @@
 		<table class="table mt-5">
 			<thead>
 				<tr>
-				<th scope="col"> ID Client </th>
+				<th scope="col"> ID Panne </th>
 				<th scope="col"> ID Ascenseur </th>
 				<th scope="col" colspan="3"> Adresse </th>
 				<th scope="col"> Date Panne </th>
@@ -19,7 +19,7 @@
 				<td>{{ entry.codePostal }}</td>
 				<td>{{ entry.ville }}</td>
 				<td>{{ formatDate(entry.dateDebut) }}</td>
-				<td>{{ isRepaired(entry.dateFin) }}</td>
+				<td>{{ isRepaired(entry.dateFin) }} <button v-if="entry.exists == null"> {{ entry.exists }} </button> </td>
 				</tr>
 			</tbody>
 		</table>
@@ -46,29 +46,22 @@
       },
     },
     methods: {
-      panneTranslation(panne){
-        if(panne == true){
-          return "Oui"
-        } else {
-          return "Non"
-        }
+      formatDate(date) {
+        const newDate = new Date(date)
+        return newDate.getDate()+"/"+newDate.getMonth()+"/"+newDate.getFullYear()
       },
-	  formatDate(date) {
-		  const newDate = new Date(date)
-		  return newDate.getDate()+"/"+newDate.getMonth()+"/"+newDate.getFullYear()
-	  },
-	  isRepaired(date) {
-		if(typeof(date) !== "number"){
-		  return "En cours de réparation."
+      isRepaired(date) {
+        if(typeof(date) !== "number"){
+          return "En cours de réparation."
         }
-        return this.formatDate(date)
-	  }
+          return this.formatDate(date)
+      }
     },
     mounted() {
       if(typeof(this.info.id) !== "number"){
         router.push({ path:'/' })
       }
-    },
+    }
   }
 </script>
 
