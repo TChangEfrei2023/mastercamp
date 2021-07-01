@@ -29,7 +29,8 @@
               :breakdowns='breakdowns'
               :clients='clients'
               @connect='connect'
-              @add-client="addClient">
+              @add-client="addClient"
+              @add-elevator="addElevator">
             </router-view>
           </main>
         </div>
@@ -38,6 +39,12 @@
     </body>
 </html>
 <style>
+  main {
+    text-align:center;
+  }
 
+  table {
+    margin:auto;
+  }
 
 </style>

@@ -21,7 +21,7 @@
 		<table class="table mt-5">
 			<thead>
 				<tr>
-				<th scope="col"> ID Panne </th>
+				<th scope="col"> ID Client </th>
 				<th scope="col"> Nom </th>
 				<th scope="col"> Email </th>
 				<th scope="col"> Tel </th>

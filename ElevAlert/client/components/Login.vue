@@ -1,6 +1,7 @@
 <template>
   <div>
     <div v-if="!isLoggedIn">
+<<<<<<< HEAD
       <div class = "parentBlock">
         <div class = "formLogin">
           <div class="identification">
@@ -22,6 +23,17 @@
             </form>
           </div>
         </div>
+=======
+      <div>
+        <h2> Identification </h2>
+        <form>
+          <label> Identifiant : </label>
+          <input type="text" v-model="credentials.idClient" placeholder="Identifiant" required>
+          <label> Mot de passe : </label>
+          <input type="text" v-model="credentials.password" placeholder="Mot de passe" required>
+          <button @click="connect()">Connexion</button>
+        </form>
+>>>>>>> 3486c172d429e6033bbbd0e371645871fc6d5841
       </div>
     </div>
   </div>
@@ -36,7 +48,7 @@ module.exports = {
   data () {
     return {
       credentials:{
-        id:'',
+        idClient:'',
         password:''
       }
     }
