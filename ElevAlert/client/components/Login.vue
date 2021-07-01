@@ -1,15 +1,27 @@
 <template>
   <div>
     <div v-if="!isLoggedIn">
-      <div>
-        <h2> Identification </h2>
-        <form>
-          <label> Identifiant : </label>
-          <input type="text" v-model="credentials.id" placeholder="Identifiant" required>
-          <label> Mot de passe : </label>
-          <input type="text" v-model="credentials.password" placeholder="Mot de passe" required>
-          <button @click="connect()">Connexion</button>
-        </form>
+      <div class = "parentBlock">
+        <div class = "formLogin">
+          <div class="identification">
+            <h2> S'identifier </h2>
+          </div>
+          <div class ="form-box">
+            <form class = "login-text">
+              <div class = "text-field">
+              <input type="text" v-model="credentials.id" required>
+              <span></span>
+              <label>Identifiant</label>
+              </div>
+              <div class= "text-field">
+              <input type="text" v-model="credentials.password" required>
+              <span></span>
+              <label>Mot de passe</label>
+              </div>
+              <button class = "connectButton" @click="connect()">Connexion</button>
+            </form>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -52,5 +64,110 @@ module.exports = {
 </script>
 
 <style scoped>
+
+@media (max-width: 600px) {
+  .formLogin{
+    width: 400px;
+    height: 300px;
+  }
+}
+
+.parentBlock{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #AAAAAA;
+  width: 100%;
+  height: 100%;
+}
+
+.formLogin{
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  width: 300px;
+  height: 300px;
+  padding: 30px;
+  background: #E8F0F2;
+  border-radius: 12px;
+}
+
+.formLogin h2{
+  text-align:left; 
+  font-size: 36px;
+  color: #053742;
+}
+
+.formLogin form{
+  box-sizing: border-box;
+}
+
+form .text-field{
+  position: relative;
+  border-bottom: 2px solid #adadad;
+  margin: 15px 0;
+}
+
+.login-text{
+  display: flex;
+  flex-direction: column;
+ 
+}
+.text-field input{
+  width: 100%;
+  padding: 0 5px;
+  height: 40px;
+  font-size: 16px;
+  border: none;
+  background: none;
+  outline: none;
+}
+
+.text-field label{
+  position: absolute;
+  top: 25px;
+  left: 5px;
+  color: #053742;
+  transform: translateY(-60%);
+  transition: .5s;
+  pointer-events: none;
+
+}
+
+.text-field span::before{
+  content: '';
+  position: absolute;
+  top: 40px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: #A2DBFA; 
+}
+
+.text-field input:focus ~ label,
+.text-field input:valid ~ label{
+  top: -5px;
+  color:  #C8C2BC;
+}
+
+.connectButton{
+  margin: 30px 0 0;
+  width: 100%;
+  height: 50px;
+  border: 1px solid;
+  background: #39A2DB;
+  border-radius: 25px;
+  font-size: 18px;
+  color: #e9f4fb;
+  font-weight: 700;
+  cursor: pointer;
+  outline: none;
+}
+
+.connectButton:hover{
+  border-color: #A2DBFA;
+  background: #053742;
+  transition: .3s;
+}
 
 </style>
