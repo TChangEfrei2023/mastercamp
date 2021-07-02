@@ -21,13 +21,24 @@
 				</div>
 			</div>
 			<nav class="navBar">
-				<router-link to='/login' class="navButton" v-if="!isLoggedIn"> Se connecter </router-link>
-				<router-link to='/clients' class="navButton" v-if="isLoggedIn && isEmployee"> Mes clients </router-link>
-				<router-link to='/elevators' class="navButton" v-if="isLoggedIn"> Ascenseurs </router-link>
-				<router-link to='/log' class="navButton" v-if="isLoggedIn"> Log </router-link>
-				<span id="user"> {{ getPrivilege() }} {{ info.nom }}</span>
-				<button id="notifBtn" @click="showHide()" v-if="isLoggedIn"> Notif </button>
-				<button @click="disconnect()" class="navButton" v-if="isLoggedIn">  Se déconnecter </button>
+				<select class="select" onchange="location = this.option[this.selectIndex].value">
+                        <option value="">Accueil</option>
+                        <option value="">Mes clients</option>
+                        <option value="">Ascenseur</option>
+                        <option value="">Log/Historique</option>
+                        <option value="">Mes employés</option>
+                        <option value="">Se déconnecter</option>
+                </select>
+				<ul>
+					<li class="item"><router-link to='/' class="navButton-left"><img class="img0"
+                            src="./logo.png" title="ElevAlert"></router-link></li>
+					<li class="item"><router-link to='/login' class="navButton" v-if="!isLoggedIn"> Se connecter </router-link></li>
+					<li class="item"><router-link to='/clients' class="navButton" v-if="isLoggedIn && isEmployee"> Mes clients </router-link></li>
+					<li class="item"><router-link to='/elevators' class="navButton" v-if="isLoggedIn"> Ascenseurs </router-link></li>
+					<li class="item"><router-link to='/log' class="navButton" v-if="isLoggedIn"> Log </router-link></li>
+					<li class="item"><span id="user"> {{ getPrivilege() }} {{ info.nom }}</span></li>
+					<li class="item1"><button @click="disconnect()" class="navButton-right" v-if="isLoggedIn">  Se déconnecter </button></li>
+					<li class="item1"><button class="notif-right" id="notifBtn" @click="showHide()" v-if="isLoggedIn"> Notif </button></li>
 			</nav>
 	    </header>
 	</div>
@@ -94,44 +105,102 @@
 </script>
 
 <style scoped>
-	.details {
-		 margin: 0;
+	body {
+        background-color: lightgray;
+    }
+    nav {
+        background-color: #F4F4F4;
+        padding: 10px;
+        padding-bottom: 0.1px;
+        margin-left: -8px;
+        margin-right: -8px;
+        margin-top: -16px;
+        box-shadow: 0px 1px 2px rgba(0, 0, 0,.2);
+    }
+    .navButton {
+        text-decoration: none;
+        padding-top: 600px;
+        padding-bottom: 17.5px;
+        padding-left: 18px;
+        padding-right: 18px;
+        text-align: center;
+    }
+    .navButton:hover {
+        background-color: lightgray;
+    }
+    .navButton-left {
+        padding-top: 600px;
+        padding-bottom: 17.5px;
+        padding-left: 18px;
+        padding-right: 18px;
+        text-decoration: none;
+    }
+    .navButton-right {
+        float: right;
+        margin-right: 32px;
+        margin-top: 16px;
+        text-decoration: none;
+		font-size: 20px;
+    }
+	.notif-right {
+		float: right;
+        margin-right: 32px;
+        margin-top: 16px;
+        text-decoration: none;
+		font-size: 20px;
 	}
-	#notifBtn {
-		position:relative;
-		right:0;
-		top:0;
-	}
-
-	.navBar {
-		background-color: skyblue;
-		height:5%;
-	}
-
-	.notifBox {
-		border: 2px solid;
-		background-color:lightgray;
-		position:absolute;
-		z-index: 0;
-		right:1;
-	}
-
-	.breakdownBox {
-		padding: 5px;
-		border: 2px solid;
-		margin:5px;
-		background-color:cadetblue ;
-	}
-
-	.announcement {
-		text-align: center;
-	}
-
-	.navButton {
-		border-radius:5px;
-		border:1px solid black;
-		margin:5px;
-		padding:5px;
-	}
+    .navButton-right:hover {
+        background-color: red;
+    }
+    li {
+        display: inline;
+    }
+    .item {
+        font-size: 25px;
+        padding-bottom: 300px;
+    }
+    .item1 {
+        font-size: 25px;
+    }
+    ul {
+        display: block;
+    }
+    img {
+        width: 181px;
+        height: 50px;
+        margin-right: 100px;
+    }
+    .active {
+        background-color: #E6E6E6;
+        padding-bottom: 20px;
+    }
+    .select {
+        display: none;
+    }
+    @media screen and (max-width: 775px) {
+        li {
+            display: none;
+        }
+        ul {
+            display : none;
+        }
+        nav {
+            padding : 8px;
+        }
+        .select {
+            display: block;
+            height: 35px;
+            text-align: center;
+            width: 100%;
+            color: gray;
+            background-color: #FAFAFA;
+            font-size: 25px;
+            text-decoration: none;
+            border-top: none;
+            border-left: none;
+            border-right: none;
+            border-bottom: 2px solid gray;
+        }
+    }
 </style>
 
