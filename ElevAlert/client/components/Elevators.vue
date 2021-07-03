@@ -1,8 +1,8 @@
 <template>
 	<div id="acc" v-if="isLoggedIn">
 		<h1> Elevator list </h1>
-    <button @click="showForm()"> <span v-if="!visibilityForm">Nouvelle ascenseur</span><span v-else> Annuler </span> </button>
-    <button @click="showCompoForm()" v-if="!visibilityForm"> <span v-if="!visibilityCompoForm">Nouveau composant</span><span v-else> Annuler </span> </button>
+    <button class="custom-btn" @click="showForm()"> <span v-if="!visibilityForm">Nouvelle ascenseur</span><span v-else> Annuler </span> </button>
+    <button class="custom-btn" @click="showCompoForm()" v-if="!visibilityForm"> <span v-if="!visibilityCompoForm">Nouveau composant</span><span v-else> Annuler </span> </button>
 		<form v-if="visibilityForm">
 			<h3> Formulaire nouvelle ascenseur </h3>
 			<label> ID Client: </label>
@@ -13,7 +13,7 @@
 			<input type="text" v-model="form.codePostal" placeholder="Num code postal">
 			<label> Ville: </label>
 			<input type="text" v-model="form.ville" placeholder="Nom ville">
-			<button @click="addElevator()"> Confirmer </button>
+			<button class="custom-btn" @click="addElevator()"> Confirmer </button>
 		</form>
 
     <form v-if="visibilityForm || visibilityCompoForm">
@@ -24,7 +24,7 @@
 			<input type="text" v-model="compoForm.idError" placeholder="Code d'erreur">
 			<label> Nom: </label>
 			<input type="text" v-model="compoForm.nom" placeholder="Nom du composant">
-			<button @click="insertComponent()"> + </button>
+			<button class="custom-btn" @click="insertComponent()"> + </button>
 		</form>
 
     <h2 v-if="visibilityCompoForm && visibilityForm"> Composants: </h2>
@@ -46,7 +46,7 @@
       </tbody>
     </table>
 
-    <table class="table">
+    <table class="minimalistBlack">
       <thead>
         <tr>
           <th scope="col"> ID Ascenseur </th>
@@ -180,15 +180,5 @@
 .no {
   border:none;
 }
-table,
-td {
-    font-size: 150%;
-    border: 1px solid #333;
-}
 
-thead,
-tfoot {
-    background-color: #333;
-    color: #fff;
-}
 </style>

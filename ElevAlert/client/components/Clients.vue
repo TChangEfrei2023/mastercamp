@@ -1,7 +1,7 @@
 <template>
 	<div id="acc" v-if="isLoggedIn && info.employe">
 		<h1> Client list </h1>
-		<button @click="showForm()"> <span v-if="!visibilityForm">Nouveau client</span><span v-else> Annuler </span> </button>
+		<button class="custom-btn" @click="showForm()"> <span v-if="!visibilityForm">Nouveau client</span><span v-else> Annuler </span> </button>
 		<form v-if="visibilityForm">
 			<p> Formulaire nouveau client </p>
 			<label> Nom: </label>
@@ -16,9 +16,9 @@
 			<input type="text" v-model="form.codePostal" placeholder="Num code postal">
 			<label> Ville: </label>
 			<input type="text" v-model="form.ville" placeholder="Nom ville">
-			<button @click="addClient()"> Confirmer </button>
+			<button class="custom-btn" @click="addClient()"> Confirmer </button>
 		</form>
-		<table class="table mt-5">
+		<table class="minimalistBlack">
 			<thead>
 				<tr>
 				<th scope="col"> ID Client </th>
@@ -91,15 +91,5 @@
 </script>
 
 <style scoped>
-table,
-td {
-    font-size: 150%;
-    border: 1px solid #333;
-}
 
-thead,
-tfoot {
-    background-color: #333;
-    color: #fff;
-}
 </style>

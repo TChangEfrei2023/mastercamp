@@ -30,15 +30,14 @@
                         <option value="">Se déconnecter</option>
                 </select>
 				<ul>
-					<li class="item"><router-link to='/' class="navButton-left"><img class="img0"
-                            src="./logo.png" title="ElevAlert"></router-link></li>
+					<li class="item"><router-link to='/' class="navButton-left"><img class="img0" src="./logo.png" title="ElevAlert"></router-link></li>
 					<li class="item"><router-link to='/login' class="navButton" v-if="!isLoggedIn"> Se connecter </router-link></li>
 					<li class="item"><router-link to='/clients' class="navButton" v-if="isLoggedIn && isEmployee"> Mes clients </router-link></li>
 					<li class="item"><router-link to='/elevators' class="navButton" v-if="isLoggedIn"> Ascenseurs </router-link></li>
 					<li class="item"><router-link to='/log' class="navButton" v-if="isLoggedIn"> Log </router-link></li>
 					<li class="item"><span id="user"> {{ getPrivilege() }} {{ info.nom }}</span></li>
-					<li class="item1"><button @click="disconnect()" class="navButton-right" v-if="isLoggedIn">  Se déconnecter </button></li>
-					<li class="item1"><button class="notif-right" id="notifBtn" @click="showHide()" v-if="isLoggedIn"> Notif </button></li>
+                    <li class="item1"><button class="custom-btn" id="notifBtn" @click="showHide()" v-if="isLoggedIn"> Notif </button></li>
+					<li class="item1"><button @click="disconnect()" class="custom-btn" v-if="isLoggedIn">  Se déconnecter </button></li>
 			</nav>
 	    </header>
 	</div>

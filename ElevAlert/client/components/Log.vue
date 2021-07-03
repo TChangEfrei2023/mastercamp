@@ -1,7 +1,7 @@
 <template>
 	<div id="acc" v-if="isLoggedIn">
 		<h1> Breakdown list </h1>
-		<table class="table mt-5">
+		<table class="minimalistBlack">
 			<thead>
 				<tr>
 				<th scope="col"> ID Panne </th>
@@ -66,15 +66,5 @@
 </script>
 
 <style scoped>
-table,
-td {
-    font-size: 150%;
-    border: 1px solid #333;
-}
 
-thead,
-tfoot {
-    background-color: #333;
-    color: #fff;
-}
 </style>
