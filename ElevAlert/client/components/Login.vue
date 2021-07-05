@@ -14,10 +14,11 @@
               <label>Identifiant</label>
               </div>
               <div class= "text-field">
-              <input type="text" v-model="credentials.password" required>
+              <input type="text" id="password-input" v-model="credentials.password" required>
               <span></span>
               <label>Mot de passe</label>
               </div>
+              <span class="icon-field">👁</span>
               <button class = "connectButton" @click="connect()">Connexion</button>
             </form>
           </div>
@@ -57,6 +58,16 @@ module.exports = {
   methods: {
   	connect(){
       this.$emit('connect',this.credentials)
+    },
+
+    showPassword(){
+      var x = document.getElementById("password-input");
+      if (x.type === "password") {
+        x.type = "text";
+      } 
+      else {
+        x.type = "password";
+      }
     }
   }
 }
@@ -71,6 +82,14 @@ module.exports = {
     height: 300px;
   }
 }
+
+.icon-field{
+  position: relative;
+  float: right;
+  margin-left: 250;
+  margin-top: -40;
+}
+
 
 .parentBlock{
   display: flex;
