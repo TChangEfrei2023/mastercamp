@@ -7,6 +7,7 @@
 		<br>
 		<div class="display">
 			<div v-if="page==0" class="cadre">
+				<button class="barBtn"> "" </button>
 				<div class="test"></div>
 				<h3 class="sectionTitle"> Détection des pannes</h3>
 				<p class="presentation2"> En tant qu'adhérant chez ElevAlert, vous profiterez d'une réduction considérable de temps de réparation de vos ascenseurs en cas de pannes.
@@ -30,6 +31,7 @@
 					un appel téléphonique de notre part pour vous avertir et fournir les détails, et un mail à votre adresse éléctronique dans le cas où
 					vous seriez indisponible.</p>
 			</div>
+			<button class=""> . </button>
 		</div>
 		<h2> - Contact - </h2>
 		<br>
@@ -77,13 +79,10 @@
 	
 	.test {
 		display:block;
-		position:absolute;
 		background-image:url("/schema.png");
 		background-color:rgba(0,0,0,0.2);
-		opacity:0.7;
 		background-repeat: no-repeat;
 		background-position:center;
-		filter:blur(3px);
 		width:100%;
 		height:100%;
 		z-index: 0;

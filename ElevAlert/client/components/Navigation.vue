@@ -161,7 +161,8 @@
 	}
 
 	header {
-		position:relative;
+		position:sticky;
+		top:0;
 		width:100%;
 	}
 

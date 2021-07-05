@@ -1,6 +1,6 @@
 <template>
 	<div id="acc" v-if="isLoggedIn && info.employe">
-		<h1> Liste des clients </h1>
+		<h1> Liste clients </h1>
 		<button class="custom-btn" @click="showForm()"> <span v-if="!visibilityForm">Nouveau client</span><span v-else> Annuler </span> </button>
 		<form v-if="visibilityForm">
 			<p> Formulaire nouveau client </p>

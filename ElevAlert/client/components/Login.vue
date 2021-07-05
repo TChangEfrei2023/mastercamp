@@ -14,7 +14,7 @@
               <label>Identifiant</label>
               </div>
               <div class= "text-field">
-              <input type="text" v-model="credentials.password" required>
+              <input type="password" v-model="credentials.password" required> <span>e</span>
               <span></span>
               <label>Mot de passe</label>
               </div>

@@ -1,6 +1,6 @@
 <template>
 	<div id="acc" v-if="isLoggedIn">
-    <h1> Liste des ascenseurs </h1>
+    <h1> Liste ascenseurs </h1>
     <div v-if="isEmployee">
       <button class="custom-btn" @click="showForm()"> <span v-if="!visibilityForm">Nouvelle ascenseur</span><span v-else> Annuler </span> </button>
       <button class="custom-btn" @click="showCompoForm()" v-if="!visibilityForm"> <span v-if="!visibilityCompoForm">Nouveau composant</span><span v-else> Annuler </span> </button>
@@ -30,23 +30,25 @@
       </form>
 
       <h2 v-if="visibilityCompoForm && visibilityForm"> Composants: </h2>
-      <table class="minimalistBlack" v-if="visibilityCompoForm && visibilityForm">
-        <thead>
-          <tr>
-            <th scope="col" v-if="!visibilityForm"> ID Ascenseur </th>
-            <th scope="col"> ID Erreur </th>
-            <th scope="col"> Nom </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(entry) in form.components" :key="entry.idElevator">
-            <td v-if="!visibilityForm">{{ entry.idElevator }}</td>
-            <td>{{ entry.idError }}</td>
-            <td>{{ entry.nom }}</td>
-            <td class="no"><button class="custom-btn" @click="deleteComponent(entry.id)"> X </button></td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="center">
+        <table class="minimalistBlack" v-if="visibilityCompoForm && visibilityForm">
+          <thead>
+            <tr>
+              <th scope="col" v-if="!visibilityForm"> ID Ascenseur </th>
+              <th scope="col"> ID Erreur </th>
+              <th scope="col"> Nom </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(entry) in form.components" :key="entry.idElevator">
+              <td v-if="!visibilityForm">{{ entry.idElevator }}</td>
+              <td>{{ entry.idError }}</td>
+              <td>{{ entry.nom }}</td>
+              <td class="no"><button class="custom-btn" @click="deleteComponent(entry.id)"> X </button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
     <div class="center">
       <table class="minimalistBlack">
