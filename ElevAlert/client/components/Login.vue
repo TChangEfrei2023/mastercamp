@@ -14,10 +14,11 @@
               <label>Identifiant</label>
               </div>
               <div class= "text-field">
-              <input type="password" v-model="credentials.password" required> <span>e</span>
+              <input type="text" id="password-input" v-model="credentials.password" required>
               <span></span>
               <label>Mot de passe</label>
               </div>
+              <span @click="showPassword()" class="icon-field"><img id="eye" class ="eye-icone" src="../eye-opened.png"></span>
               <button class = "connectButton" @click="connect()">Connexion</button>
             </form>
           </div>
@@ -57,6 +58,19 @@ module.exports = {
   methods: {
   	connect(){
       this.$emit('connect',this.credentials)
+    },
+
+    showPassword(){
+      var x = document.getElementById("password-input");
+      var eye = document.getElementById("eye");
+      if (x.type === "password") {
+        x.type = "text";
+        eye.setAttribute("src", "../eye-opened.png");
+      } 
+      else {
+        x.type = "password";
+        eye.setAttribute("src", "../eye-closed.png");
+      }
     }
   }
 }
@@ -70,6 +84,19 @@ module.exports = {
     width: 400px;
     height: 300px;
   }
+}
+
+.icon-field{
+  position: relative;
+  float: right;
+  margin-left: 250;
+  margin-top: -40;
+  cursor: pointer;
+}
+
+.eye-icone{
+  width: 20px;
+  height: 20px;
 }
 
 .parentBlock{
