@@ -109,6 +109,7 @@
 
 <style scoped>
 	.notifBox {
+		overflow-x: hidden;
 		position:absolute;
 		right:5px;
 		top:auto;
@@ -120,6 +121,7 @@
 		min-width:300px;
 		min-height:100px;
 		max-height:calc(75vh - 62px - 75px);
+		z-index: 1000;
 	}
 
 	.announcement {
@@ -156,7 +158,11 @@
 		display:flex;
 		flex-wrap:wrap;
 		justify-content:space-around;
-		box-sizing:inherit;
+	}
+
+	header {
+		position:relative;
+		width:100%;
 	}
 
 	.containerOtherBtn {

@@ -1,28 +1,30 @@
 <template>
 	<div id="acc" v-if="isLoggedIn">
-		<h1> Breakdown list </h1>
-		<table class="table mt-5">
-			<thead>
-				<tr>
-				<th scope="col"> ID Panne </th>
-				<th scope="col"> ID Ascenseur </th>
-				<th scope="col" colspan="3"> Adresse </th>
-				<th scope="col"> Date Panne </th>
-				<th scope="col"> Date Résolution </th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr v-for="(entry) in breakdowns" :key="entry.idBreakdown">
-				<th scope="row">{{ entry.idBreakdown }}</th>
-				<td>{{ entry.idElevator }}</td>
-				<td>{{ entry.rue }}</td>
-				<td>{{ entry.codePostal }}</td>
-				<td>{{ entry.ville }}</td>
-				<td>{{ formatDate(entry.dateDebut) }}</td>
-				<td>{{ isRepaired(entry.dateFin) }}  </td>
-				</tr>
-			</tbody>
-		</table>
+		<h1> Liste des pannes </h1>
+    <div class="center">
+      <table class="minimalistBlack">
+        <thead>
+          <tr>
+          <th scope="col"> ID Panne </th>
+          <th scope="col"> ID Ascenseur </th>
+          <th scope="col" colspan="3"> Adresse </th>
+          <th scope="col"> Date Panne </th>
+          <th scope="col"> Date Résolution </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(entry) in breakdowns" :key="entry.idBreakdown">
+          <th scope="row">{{ entry.idBreakdown }}</th>
+          <td>{{ entry.idElevator }}</td>
+          <td>{{ entry.rue }}</td>
+          <td>{{ entry.codePostal }}</td>
+          <td>{{ entry.ville }}</td>
+          <td>{{ formatDate(entry.dateDebut) }}</td>
+          <td>{{ isRepaired(entry.dateFin) }}  </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 	</div>
 </template>
 
@@ -66,15 +68,5 @@
 </script>
 
 <style scoped>
-table,
-td {
-    font-size: 150%;
-    border: 1px solid #333;
-}
 
-thead,
-tfoot {
-    background-color: #333;
-    color: #fff;
-}
 </style>

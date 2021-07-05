@@ -1,45 +1,47 @@
 <template>
 	<div id="acc" v-if="isLoggedIn && info.employe">
-		<h1> Client list </h1>
-		<button @click="showForm()"> <span v-if="!visibilityForm">Nouveau client</span><span v-else> Annuler </span> </button>
+		<h1> Liste des clients </h1>
+		<button class="custom-btn" @click="showForm()"> <span v-if="!visibilityForm">Nouveau client</span><span v-else> Annuler </span> </button>
 		<form v-if="visibilityForm">
 			<p> Formulaire nouveau client </p>
-			<label> Nom: </label>
-			<input type="text" v-model="form.nom" placeholder="Nom">
-			<label> Email: </label>
-			<input type="text" v-model="form.email" placeholder="Email">
-			<label> Tel: </label>
-			<input type="text" v-model="form.tel" placeholder="Téléphone">
-			<label> Rue: </label>
-			<input type="text" v-model="form.rue" placeholder="Nom rue">
-			<label> Code Postal: </label>
-			<input type="text" v-model="form.codePostal" placeholder="Num code postal">
-			<label> Ville: </label>
-			<input type="text" v-model="form.ville" placeholder="Nom ville">
-			<button @click="addClient()"> Confirmer </button>
+			<label> Nom: <input class="entree" type="text" v-model="form.nom" placeholder="Nom"></label>
+			
+			<label> Email: <input class="entree" type="text" v-model="form.email" placeholder="Email"></label>
+			
+			<label> Tel: <input class="entree" type="text" v-model="form.tel" placeholder="Téléphone"></label>
+			
+			<label> Rue: <input class="entree" type="text" v-model="form.rue" placeholder="Nom rue"> </label>
+			
+			<label> Code Postal: <input class="entree" type="text" v-model="form.codePostal" placeholder="Num code postal"></label>
+			
+			<label> Ville: <input class="entree" type="text" v-model="form.ville" placeholder="Nom ville"></label>
+			
+			<button class="custom-btn" @click="addClient()"> Confirmer </button>
 		</form>
-		<table class="table mt-5">
-			<thead>
-				<tr>
-				<th scope="col"> ID Client </th>
-				<th scope="col"> Nom </th>
-				<th scope="col"> Email </th>
-				<th scope="col"> Tel </th>
-				<th scope="col" colspan="3"> Adresse </th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr v-for="(entry) in clients" :key="entry.idClient">
-				<th scope="row">{{ entry.idClient }}</th>
-				<td>{{ entry.nom }}</td>
-				<td>{{ entry.email }}</td>
-				<td>{{ entry.tel }}</td>
-				<td>{{ entry.rue }}</td>
-				<td>{{ entry.codePostal }}</td>
-				<td>{{ entry.ville }}</td>
-				</tr>
-			</tbody>
-		</table>
+		<div class="center">
+			<table class="minimalistBlack">
+				<thead>
+					<tr>
+					<th scope="col"> ID Client </th>
+					<th scope="col"> Nom </th>
+					<th scope="col"> Email </th>
+					<th scope="col"> Tel </th>
+					<th scope="col" colspan="3"> Adresse </th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr v-for="(entry) in clients" :key="entry.idClient">
+					<th scope="row">{{ entry.idClient }}</th>
+					<td>{{ entry.nom }}</td>
+					<td>{{ entry.email }}</td>
+					<td>{{ entry.tel }}</td>
+					<td>{{ entry.rue }}</td>
+					<td>{{ entry.codePostal }}</td>
+					<td>{{ entry.ville }}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
 	</div>
 </template>
 
@@ -91,15 +93,5 @@
 </script>
 
 <style scoped>
-table,
-td {
-    font-size: 150%;
-    border: 1px solid #333;
-}
 
-thead,
-tfoot {
-    background-color: #333;
-    color: #fff;
-}
 </style>

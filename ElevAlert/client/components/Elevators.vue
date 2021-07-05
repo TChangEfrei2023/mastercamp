@@ -1,9 +1,9 @@
 <template>
 	<div id="acc" v-if="isLoggedIn">
-    <h1> Elevator list </h1>
+    <h1> Liste des ascenseurs </h1>
     <div v-if="isEmployee">
-      <button @click="showForm()"> <span v-if="!visibilityForm">Nouvelle ascenseur</span><span v-else> Annuler </span> </button>
-      <button @click="showCompoForm()" v-if="!visibilityForm"> <span v-if="!visibilityCompoForm">Nouveau composant</span><span v-else> Annuler </span> </button>
+      <button class="custom-btn" @click="showForm()"> <span v-if="!visibilityForm">Nouvelle ascenseur</span><span v-else> Annuler </span> </button>
+      <button class="custom-btn" @click="showCompoForm()" v-if="!visibilityForm"> <span v-if="!visibilityCompoForm">Nouveau composant</span><span v-else> Annuler </span> </button>
       <form v-if="visibilityForm">
         <h3> Formulaire nouvelle ascenseur </h3>
         <label> ID Client: </label>
@@ -14,7 +14,7 @@
         <input type="text" v-model="form.codePostal" placeholder="Num code postal">
         <label> Ville: </label>
         <input type="text" v-model="form.ville" placeholder="Nom ville">
-        <button @click="addElevator()"> Confirmer </button>
+        <button class="custom-btn" @click="addElevator()"> Confirmer </button>
       </form>
 
       <form v-if="visibilityForm || visibilityCompoForm">
@@ -25,12 +25,12 @@
         <input type="text" v-model="compoForm.idError" placeholder="Code d'erreur">
         <label> Nom: </label>
         <input type="text" v-model="compoForm.nom" placeholder="Nom du composant">
-        <button @click="insertComponent()" v-if="visibilityForm"> + </button>
-        <button @click="addComponent()" v-if="!visibilityForm"> Ajouter </button>
+        <button class="custom-btn" @click="insertComponent()" v-if="visibilityForm"> + </button>
+        <button class="custom-btn" @click="addComponent()" v-if="!visibilityForm"> Ajouter </button>
       </form>
 
       <h2 v-if="visibilityCompoForm && visibilityForm"> Composants: </h2>
-      <table v-if="visibilityCompoForm && visibilityForm">
+      <table class="minimalistBlack" v-if="visibilityCompoForm && visibilityForm">
         <thead>
           <tr>
             <th scope="col" v-if="!visibilityForm"> ID Ascenseur </th>
@@ -43,32 +43,33 @@
             <td v-if="!visibilityForm">{{ entry.idElevator }}</td>
             <td>{{ entry.idError }}</td>
             <td>{{ entry.nom }}</td>
-            <td class="no"><button @click="deleteComponent(entry.id)"> X </button></td>
+            <td class="no"><button class="custom-btn" @click="deleteComponent(entry.id)"> X </button></td>
           </tr>
         </tbody>
       </table>
     </div>
-
-    <table class="table">
-      <thead>
-        <tr>
-          <th scope="col"> ID Ascenseur </th>
-          <th scope="col" v-if="info.employe"> Entreprise </th>
-          <th scope="col" colspan="3"> Adresse </th>
-          <th scope="col"> Status </th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(entry) in elevators" :key="entry.idElevator">
-          <th scope="row">{{ entry.idElevator }}</th>
-          <td v-if="info.employe">{{ entry.nom }}</td>
-          <td>{{ entry.rue }}</td>
-          <td>{{ entry.codePostal }}</td>
-          <td>{{ entry.ville }}</td>
-          <td>{{ panneTranslation(entry.exists) }} </td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="center">
+      <table class="minimalistBlack">
+        <thead>
+          <tr>
+            <th scope="col"> ID Ascenseur </th>
+            <th scope="col" v-if="info.employe"> Entreprise </th>
+            <th scope="col" colspan="3"> Adresse </th>
+            <th scope="col"> Status </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(entry) in elevators" :key="entry.idElevator">
+            <th scope="row">{{ entry.idElevator }}</th>
+            <td v-if="info.employe">{{ entry.nom }}</td>
+            <td>{{ entry.rue }}</td>
+            <td>{{ entry.codePostal }}</td>
+            <td>{{ entry.ville }}</td>
+            <td>{{ panneTranslation(entry.exists) }} </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 	</div>
 </template>
 
@@ -192,15 +193,5 @@
 .no {
   border:none;
 }
-table,
-td {
-    font-size: 150%;
-    border: 1px solid #333;
-}
 
-thead,
-tfoot {
-    background-color: #333;
-    color: #fff;
-}
 </style>
