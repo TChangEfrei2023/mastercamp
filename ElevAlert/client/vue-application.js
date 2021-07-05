@@ -102,6 +102,9 @@ var app = new Vue({
           this.elevators = elevatorList.data.content
         }
       }
+    },
+    async addComponent(form){
+      await axios.put('/api/compose',form)
     }
   }
 })

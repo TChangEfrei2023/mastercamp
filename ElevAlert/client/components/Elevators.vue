@@ -1,50 +1,53 @@
 <template>
 	<div id="acc" v-if="isLoggedIn">
-		<h1> Elevator list </h1>
-    <button @click="showForm()"> <span v-if="!visibilityForm">Nouvelle ascenseur</span><span v-else> Annuler </span> </button>
-    <button @click="showCompoForm()" v-if="!visibilityForm"> <span v-if="!visibilityCompoForm">Nouveau composant</span><span v-else> Annuler </span> </button>
-		<form v-if="visibilityForm">
-			<h3> Formulaire nouvelle ascenseur </h3>
-			<label> ID Client: </label>
-			<input type="text" v-model="form.idClient" placeholder="ID Client">
-			<label> Rue: </label>
-			<input type="text" v-model="form.rue" placeholder="Nom rue">
-			<label> Code Postal: </label>
-			<input type="text" v-model="form.codePostal" placeholder="Num code postal">
-			<label> Ville: </label>
-			<input type="text" v-model="form.ville" placeholder="Nom ville">
-			<button @click="addElevator()"> Confirmer </button>
-		</form>
+    <h1> Elevator list </h1>
+    <div v-if="isEmployee">
+      <button @click="showForm()"> <span v-if="!visibilityForm">Nouvelle ascenseur</span><span v-else> Annuler </span> </button>
+      <button @click="showCompoForm()" v-if="!visibilityForm"> <span v-if="!visibilityCompoForm">Nouveau composant</span><span v-else> Annuler </span> </button>
+      <form v-if="visibilityForm">
+        <h3> Formulaire nouvelle ascenseur </h3>
+        <label> ID Client: </label>
+        <input type="text" v-model="form.idClient" placeholder="ID Client">
+        <label> Rue: </label>
+        <input type="text" v-model="form.rue" placeholder="Nom rue">
+        <label> Code Postal: </label>
+        <input type="text" v-model="form.codePostal" placeholder="Num code postal">
+        <label> Ville: </label>
+        <input type="text" v-model="form.ville" placeholder="Nom ville">
+        <button @click="addElevator()"> Confirmer </button>
+      </form>
 
-    <form v-if="visibilityForm || visibilityCompoForm">
-			<h3> Formulaire nouveau composant </h3>
-			<label v-if="!visibilityForm"> ID Ascenseur: </label>
-			<input v-if="!visibilityForm" type="text" v-model="compoForm.idElevator" placeholder="ID Ascenseur">
-			<label> ID Erreur: </label>
-			<input type="text" v-model="compoForm.idError" placeholder="Code d'erreur">
-			<label> Nom: </label>
-			<input type="text" v-model="compoForm.nom" placeholder="Nom du composant">
-			<button @click="insertComponent()"> + </button>
-		</form>
+      <form v-if="visibilityForm || visibilityCompoForm">
+        <h3> Formulaire nouveau composant </h3>
+        <label v-if="!visibilityForm"> ID Ascenseur: </label>
+        <input v-if="!visibilityForm" type="text" v-model="compoForm.idElevator" placeholder="ID Ascenseur">
+        <label> ID Erreur: </label>
+        <input type="text" v-model="compoForm.idError" placeholder="Code d'erreur">
+        <label> Nom: </label>
+        <input type="text" v-model="compoForm.nom" placeholder="Nom du composant">
+        <button @click="insertComponent()" v-if="visibilityForm"> + </button>
+        <button @click="addComponent()" v-if="!visibilityForm"> Ajouter </button>
+      </form>
 
-    <h2 v-if="visibilityCompoForm && visibilityForm"> Composants: </h2>
-    <table v-if="visibilityCompoForm && visibilityForm">
-      <thead>
-        <tr>
-          <th scope="col" v-if="!visibilityForm"> ID Ascenseur </th>
-          <th scope="col"> ID Erreur </th>
-          <th scope="col"> Nom </th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(entry) in form.components" :key="entry.idElevator">
-          <td v-if="!visibilityForm">{{ entry.idElevator }}</td>
-          <td>{{ entry.idError }}</td>
-          <td>{{ entry.nom }}</td>
-          <td class="no"><button @click="deleteComponent(entry.id)"> X </button></td>
-        </tr>
-      </tbody>
-    </table>
+      <h2 v-if="visibilityCompoForm && visibilityForm"> Composants: </h2>
+      <table v-if="visibilityCompoForm && visibilityForm">
+        <thead>
+          <tr>
+            <th scope="col" v-if="!visibilityForm"> ID Ascenseur </th>
+            <th scope="col"> ID Erreur </th>
+            <th scope="col"> Nom </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(entry) in form.components" :key="entry.idElevator">
+            <td v-if="!visibilityForm">{{ entry.idElevator }}</td>
+            <td>{{ entry.idError }}</td>
+            <td>{{ entry.nom }}</td>
+            <td class="no"><button @click="deleteComponent(entry.id)"> X </button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
     <table class="table">
       <thead>
@@ -101,6 +104,12 @@
           return 0
         }
         return 1
+      },
+      isEmployee: function() {
+        if(this.info.employe == true) {
+          return 1
+        }
+        return 0
       }
     },
     methods: {
@@ -166,6 +175,9 @@
           idError:'',
           nom:''
         }
+      },
+      addComponent(){
+        this.$emit('add-component',this.compoForm)
       }
     },
     mounted() {

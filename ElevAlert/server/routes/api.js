@@ -100,7 +100,7 @@ router.get('/breakdowns',async(req,res) => {
 
   const select = 'SELECT "idBreakdown","Component"."idComponent","Component"."idElevator", "rue", "codePostal", "ville", "dateDebut", "dateFin"  '
   const from = 'FROM "Breakdown","Component",("Elevator" LEFT JOIN "Adresse" ON "Elevator"."idAdresse" = "Adresse"."idAdresse") AS PA '
-  const where = 'WHERE "Breakdown"."idComponent"="Component"."idComponent" AND PA."idElevator" = "Component"."idElevator" '
+  var where = 'WHERE "Breakdown"."idComponent"="Component"."idComponent" AND PA."idElevator" = "Component"."idElevator" '
   const order = 'ORDER BY "idBreakdown";'
   var resultBreakdowns
   if(req.session.employe == true){
@@ -109,7 +109,7 @@ router.get('/breakdowns',async(req,res) => {
       text:query
     })
   } else {
-    where = where.concat('',' AND "Component"."idElevator" = $1 ')
+    where = where.concat('','AND PA."idClient" = $1 ')
     const query = select+from+where+order
     resultBreakdowns = await client.query({
       text:query,
@@ -401,9 +401,9 @@ router.post('/installation',async(req,res) => {
 })
 
 
-/*  An elevator is composed of components that are constantly tested by our service. ------------------------------------------------------------------------------------
+/*  An elevator is composed of components that are constantly tested by our service. 
     This route will add a component with its details. */
-router.post('/compose/',async(req,res) => {
+router.put('/compose',async(req,res) => {
   if(typeof(req.session.userId) !== "number") {
     res.json({ message: "User not connected" })
     return
@@ -412,40 +412,30 @@ router.post('/compose/',async(req,res) => {
   const idElevator = req.body.idElevator
   const idError = req.body.idError
   const nom = req.body.nom
-  const status = req.body.status
 
   if(typeof(idElevator) !== "string" || idElevator == ''
     || typeof(idError) !== "string" || idError == ''
-    || typeof(nom) !== "string" || nom == ''
-    || typeof(status) !== "string" || status == '') {
+    || typeof(nom) !== "string" || nom == '') {
       res.status(400).json({ message : "Missing or invalid field(s)." })
       return
   }
 
-  const resultBreakdown = await client.query({
-    text:'SELECT * FROM "Breakdown" WHERE "idComponent"=$1 AND "dateFin" IS null;',
-    values:[id]
+  const resultAscenseur = await client.query({
+    text:'SELECT * FROM "Elevator" WHERE "idElevator"=$1;',
+    values:[idElevator]
   })
-  const foundBreakdown = resultBreakdown.rows.find(a => a.idComponent == id)
-  if(!foundBreakdown){
-    res.json({ message: "Breakdown not found." })
+  const foundAscenseur = resultAscenseur.rows.find(a => a.idElevator == idElevator)
+  if(!foundAscenseur){
+    res.json({ message: "Elevator not found." })
     return
   }
 
-  if(foundBreakdown.dateFin != null){
-    res.json({ message: "This breakdown has already been repaired." })
-    return
-  }
-
-  var date = new Date()
-  var currentUTCDate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), date.getMinutes(), date.getSeconds()))
-
-  const updateBreakdown = await client.query({
-    text:'UPDATE "Breakdown" SET "dateFin"=$1 WHERE "idComponent" = $2 AND "idBreakdown" = $3;',
-    values:[currentUTCDate,id,foundBreakdown.idBreakdown]
+  const addComponent = await client.query({
+    text:'INSERT INTO "Component" ("idElevator", "idError", "nom","status") VALUES ($1, $2, $3, $4);',
+    values:[idElevator,idError,nom,true]
   })
 
-  res.json({ message: "Repair success" })
+  res.json({ message: "Component successfully added." })
   return
 })
     
@@ -679,21 +669,17 @@ router.post('/reception/:idBreakdown',async(req,res) => {
   }
   
   if(!req.session.employe) {
-    const resultElevator = await client.query({
-      text:'SELECT * FROM "Elevator" WHERE "idElevator"=$1;',
-      values:[foundBreakdown.idElevator]
+    const resultClient = await client.query({
+      text:'SELECT "idClient" FROM "Elevator" LEFT JOIN "Component" ON "Elevator"."idElevator" = "Component"."idElevator" WHERE "Component"."idComponent" = $1;',
+      values:[foundBreakdown.idComponent]
     })
-    const foundElevator = resultElevator.rows.find(a => a.idElevator == foundBreakdown.idElevator)
-    if(foundElevator){
-      if(req.session.userId != foundElevator.idClient) {
-        res.json({ message: "User is not the owner of the elevator." })
-        return
-      }
-    } else {
-      res.json({ message: "Elevator not found." })
+    const foundClient = resultClient.rows.find(a => a.idClient == req.session.userId)
+    if(!foundClient){
+      res.json({ message: "User is not the owner or elevator not found." })
       return
     }
   }
+
   const updateBreakdown = await client.query({
     text:'UPDATE "Breakdown" SET "reception"=$1 WHERE "idBreakdown" = $2;',
     values:[true,id]
