@@ -18,7 +18,7 @@
               <span></span>
               <label>Mot de passe</label>
               </div>
-              <span class="icon-field">👁</span>
+              <span @click="showPassword()" class="icon-field"><img id="eye" class ="eye-icone" src="../eye-opened.png"></span>
               <button class = "connectButton" @click="connect()">Connexion</button>
             </form>
           </div>
@@ -62,11 +62,14 @@ module.exports = {
 
     showPassword(){
       var x = document.getElementById("password-input");
+      var eye = document.getElementById("eye");
       if (x.type === "password") {
         x.type = "text";
+        eye.setAttribute("src", "../eye-opened.png");
       } 
       else {
         x.type = "password";
+        eye.setAttribute("src", "../eye-closed.png");
       }
     }
   }
@@ -88,8 +91,13 @@ module.exports = {
   float: right;
   margin-left: 250;
   margin-top: -40;
+  cursor: pointer;
 }
 
+.eye-icone{
+  width: 20px;
+  height: 20px;
+}
 
 .parentBlock{
   display: flex;
