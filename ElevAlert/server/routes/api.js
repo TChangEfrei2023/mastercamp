@@ -7,7 +7,7 @@ const { Client } = require('pg')
 const client = new Client({
   user: 'postgres',
   host: 'localhost',
-  password: '0000',
+  password: 'lolpopo',
   database: 'elevalert_db'
 })
 
@@ -27,7 +27,6 @@ router.use((req,res,next) => {
   next()
 })
 
-
 /*  Get the current session's information */
 router.get('/me',async(req,res) => {
   if(typeof(req.session.userId) === "number") {
@@ -46,7 +45,7 @@ router.get('/me',async(req,res) => {
 /*  Get elevators list from database */
 router.get('/elevators',async(req,res) => {
   if(typeof(req.session.userId) !== "number") {
-    res.status(400).json({ message : "User not connected" })
+    res.status(401).json({ message : "User not connected" })
     return
   }
 
@@ -89,12 +88,10 @@ router.get('/elevators',async(req,res) => {
   return
 })
 
-
-
 /*  Get breakdowns list from database */
 router.get('/breakdowns',async(req,res) => {
   if(typeof(req.session.userId) !== "number") {
-    res.status(400).json({ message : "User not connected" })
+    res.status(401).json({ message : "User not connected" })
     return
   }
 
@@ -126,7 +123,7 @@ router.get('/breakdowns',async(req,res) => {
 /*  Get clients list from database */
 router.get('/clients',async(req,res) => {
   if(typeof(req.session.userId) !== "number") {
-    res.status(400).json({ message : "User not connected" })
+    res.status(401).json({ message : "User not connected" })
     return
   }
 
@@ -153,7 +150,7 @@ router.get('/clients',async(req,res) => {
 /*  Get clients list from database */
 router.get('/components',async(req,res) => {
   if(typeof(req.session.elevatorId) !== "number") {
-    res.status(400).json({ message : "User not connected" })
+    res.status(401).json({ message : "User not connected" })
     return
   }
 
@@ -179,7 +176,7 @@ router.get('/components',async(req,res) => {
     found: list of elevators that have an unrepaired breakdown */
 router.get('/notification',async(req,res) => {
   if(typeof(req.session.userId) !== "number") {
-    res.json({ message: "User not connected" })
+    res.status(401).json({ message: "User not connected" })
     return
   }
 
@@ -243,7 +240,7 @@ router.get('/notification',async(req,res) => {
     hash : hash password */
 router.post('/register',async(req,res) => {
   if(typeof(req.session.userId) !== "number") {
-    res.status(400).json({ message : "User not connected" })
+    res.status(401).json({ message : "User not connected" })
     return
   }
 
@@ -330,7 +327,7 @@ router.post('/register',async(req,res) => {
     - Creates new Adresse and return the new adresse's ID into idAdresse */
 router.post('/installation',async(req,res) => {
   if(typeof(req.session.userId) !== "number") {
-    res.status(400).json({ message : "User not connected" })
+    res.status(401).json({ message : "User not connected" })
     return
   }
 
@@ -448,14 +445,18 @@ router.put('/compose',async(req,res) => {
     result : SQL query to check if client exists
     found : contains data of the query */
 router.post('/login',async(req,res) => {
-  if(req.body == {}){
-    res.status(400).json({ message: "Tu m'as rien envoyé gro" })
+  const id = req.body.idClient
+  const password = req.body.password
+
+  if(typeof(id) !== "string" || id == ''
+  || typeof(password) !== "string" || password == '') {
+    res.status(400).json({ message : "Missing or invalid field(s)." })
     return
   }
-  const id = req.body.idClient
+
   const idLogin = parseInt(id.match(/[0-9]+/));
   const employeLogin = id.match(/[a-zA-Z]+/);
-  const password = req.body.password
+  
 
   var found
   if(typeof(req.session.userId) !== 'number') {
@@ -493,7 +494,7 @@ router.post('/login',async(req,res) => {
       return
     }
   } else {
-    res.status(401).json({ message: "User already connected" })
+    res.status(400).json({ message: "User already connected" })
     return
   }
 })
@@ -507,33 +508,39 @@ router.post('/connect',async(req,res) => {
   const id = req.body.idElevator
   const password = req.body.password
 
-  if(typeof(req.session.elevatorId) !== 'number') {
-    const resultElevator = await client.query({
-      text:'SELECT * FROM "Elevator" WHERE "idElevator" = $1;',
-      values:[id]
-    })
-    const foundElevator = resultElevator.rows.find(a => a.idElevator == id)
-    if(foundElevator){
-      const resultClient = await client.query({
-        text:'SELECT * FROM "Client" WHERE "idClient" = $1;',
-        values:[foundElevator.idClient]
-      })
-      const foundClient = resultClient.rows.find(a => a.idClient == foundElevator.idClient)
-      if(await bcrypt.compare(password,foundClient.mdp)) {
-        req.session.elevatorId = foundElevator.idElevator
-        res.json({ message: "Connection successful" })
-      } else {
-        res.status(400).json({ message: "Wrong password" })
-        return
-      }
-    } else {
-      res.status(400).json({ message: "Account doesn't exist" })
-      return
-    }
-  } else {
+  if(typeof(req.session.elevatorId) === 'number') {
     res.status(401).json({ message: "Elevator already connected" })
     return
   }
+
+  const resultElevator = await client.query({
+    text:'SELECT * FROM "Elevator" WHERE "idElevator" = $1;',
+    values:[id]
+  })
+  
+  const foundElevator = resultElevator.rows.find(a => a.idElevator == id)
+  if(foundElevator){
+    const resultClient = await client.query({
+      text:'SELECT * FROM "Client" WHERE "idClient" = $1;',
+      values:[foundElevator.idClient]
+    })
+    const foundClient = resultClient.rows.find(a => a.idClient == foundElevator.idClient)
+    if(await bcrypt.compare(password,foundClient.mdp)) {
+      req.session.elevatorId = foundElevator.idElevator
+      res.json({ message: "Connection successful" })
+      return
+
+    } else {
+      res.status(400).json({ message: "Wrong password" })
+      return
+
+    }
+  } else {
+    res.status(400).json({ message: "Account doesn't exist" })
+    return
+    
+  }
+
 })
 
 /*  User tries to disconnect, session's information are erased */

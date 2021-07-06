@@ -34,7 +34,7 @@
 					<h4> - Contact - </h4>
 					<p class="details"> <b> Email : </b> {{ notif.email }}  </p>
 					<p class="details"> <b> Tel : </b> {{ notif.tel }} </p>
-					<button class="confirmButton"> Confirmer </button>
+					<button class="confirmButton" @click="confirmNotification(notif.idBreakdown)"> Confirmer </button>
 				</div>
 			</div>
 			<div v-else>
@@ -202,7 +202,7 @@
 		padding:20px;
 		padding-left:8px;
 		padding-right:8px;
-		font-size: 16px;
+		font-size: 15px;
         text-decoration: none;
 		color:#00414f;
 		background-color: #F4F4F4;
@@ -217,8 +217,8 @@
 	}
 
     .logo {
-        width: 181px;
-        height: 50px;
+        max-width: 181px;
+        max-height: 50px;
     }
 
 	.notifZero {
