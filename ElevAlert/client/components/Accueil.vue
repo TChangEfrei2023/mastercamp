@@ -8,39 +8,40 @@
 				<p class="presentation1">ElevAlert est un service technique qui permet à ses adhérants d'avoir 
 			une meilleure vue sur les éventuelles pannes qui peuvent se produire à tout moment.</p>
 			</div>
-			
 		</section>
 		<h2> - Nos services - </h2>
 		<br>
 		<div class="inline">
 			<div class="display">
 				<button class="sizeBtn left" @click="moveSlideShow(false)"> &lt; </button>
-				<div v-if="page==0" class="cadre">
-					<div class="image pic0"></div>
-					<h3 class="sectionTitle"> Détection des pannes</h3>
-					<p class="presentation2"> En tant qu'adhérant chez ElevAlert, vous profiterez d'une réduction considérable de temps de réparation de vos ascenseurs en cas de pannes.
-					Notre but est de faciliter la réparation des pannes de vos ascenseurs en localisant l'origine des pannes avec une bonne précision à l'aide de nos outils. </p>
-				</div>
-				<div v-if="page==1" class="cadre">
-					<div class="image pic1"></div>
-					<h3 class="sectionTitle"> Rapport détaillé pour chaque panne </h3>
-					<p class="presentation2"> Grâce à la détection des pannes, nous sommes capables de vous fournir un rapport détaillé sur une éventuelle panne qui permettra 
-						aux réparateurs de se focaliser sur le problème et ainsi réduire considérablement le temps de réparation. </p>
-				</div>
-				<div v-if="page==2" class="cadre">
-					<div class="image pic2"></div>
-					<h3 class="sectionTitle"> Accès à la platforme ElevAlert </h3>
-					<p class="presentation2"> Vous êtes une entreprise possédant beaucoup d'ascenseurs ? Pas de soucis, nos adhérants possèdent un accès sur notre
-						platforme web. Il vous suffira de vous connecter afin d'avoir une vue générale sur l'état de vos ascenseurs équipés de nos outils, 
-						ainsi qu'un historique des pannes réglées et même en cours de réparation. </p>
-				</div>
-				<div v-if="page==3" class="cadre">
-					<div class="image pic3"></div>
-					<h3 class="sectionTitle"> Notifications des pannes </h3>
-					<p class="presentation2"> Le plus important pour nos adhérants est de pouvoir être averti le plus vite possible. Lorsqu'une panne survient,
-						notre serveur est capable de recevoir l'information rapidement afin qu'on puisse vous en avertir par deux moyens : 
-						un appel téléphonique de notre part pour vous avertir et fournir les détails, et un mail à votre adresse éléctronique dans le cas où
-						vous seriez indisponible.</p>
+				<div class="containerCadre">
+					<div v-if="page==0" class="cadre">
+						<div class="image pic0"></div>
+						<h3 class="sectionTitle"> Détection des pannes</h3>
+						<p class="presentation2"> En tant qu'adhérant chez ElevAlert, vous profiterez d'une réduction considérable de temps de réparation de vos ascenseurs en cas de pannes.
+						Notre but est de faciliter la réparation des pannes de vos ascenseurs en localisant l'origine des pannes avec une bonne précision à l'aide de nos outils. </p>
+					</div>
+					<div v-if="page==1" class="cadre">
+						<div class="image pic1"></div>
+						<h3 class="sectionTitle"> Rapport détaillé pour chaque panne </h3>
+						<p class="presentation2"> Grâce à la détection des pannes, nous sommes capables de vous fournir un rapport détaillé sur une éventuelle panne qui permettra 
+							aux réparateurs de se focaliser sur le problème et ainsi réduire considérablement le temps de réparation. </p>
+					</div>
+					<div v-if="page==2" class="cadre">
+						<div class="image pic2"></div>
+						<h3 class="sectionTitle"> Accès à la platforme ElevAlert </h3>
+						<p class="presentation2"> Vous êtes une entreprise possédant beaucoup d'ascenseurs ? Pas de soucis, nos adhérants possèdent un accès sur notre
+							platforme web. Il vous suffira de vous connecter afin d'avoir une vue générale sur l'état de vos ascenseurs équipés de nos outils, 
+							ainsi qu'un historique des pannes réglées et même en cours de réparation. </p>
+					</div>
+					<div v-if="page==3" class="cadre">
+						<div class="image pic3"></div>
+						<h3 class="sectionTitle"> Notifications des pannes </h3>
+						<p class="presentation2"> Le plus important pour nos adhérants est de pouvoir être averti le plus vite possible. Lorsqu'une panne survient,
+							notre serveur est capable de recevoir l'information rapidement afin qu'on puisse vous en avertir par deux moyens : 
+							un appel téléphonique de notre part pour vous avertir et fournir les détails, et un mail à votre adresse éléctronique dans le cas où
+							vous seriez indisponible.</p>
+					</div>
 				</div>
 				<button class="sizeBtn right" @click="moveSlideShow(true)"> &gt; </button>
 			</div>
@@ -48,8 +49,8 @@
 		<div class="minicadre">
 			<h2> - Contact - </h2>
 			<br>
-			<p> Email : elevalert@hotmail.com </p>
-			<p> Tel : 01 50 25 16 52 </p>
+			<p class="detail"> Email : <b>elevalert@hotmail.com</b> </p>
+			<p class="detail"> Tel : <b>01 50 25 16 52</b> </p>
 		</div>
 		<footer>
 		</footer>
@@ -99,10 +100,12 @@
 </script>
 
 <style scoped>
-	.sizeBtn {
-		height:70vh;
-	}
 
+	.containerCadre {
+		position:relative;
+		z-index: -1;
+		box-shadow:0px 10px 10px rgba(0,0,0,0.6);
+	}
 	.inline {
 		display:flex;
 		justify-content: center;
@@ -119,6 +122,7 @@
   		justify-content: center;
 		font-size: 30px;
 		z-index: 1;
+		margin-bottom:50px;
 	}
 
 	#cover::after {
@@ -175,9 +179,9 @@
 	}
 
 	.presentation1 {
-		max-width:500px;
+		max-width:700px;
 		margin:auto;
-		margin-top:25px;
+		margin-top:250px;
 		margin-bottom:25px;
 		color: #EFEFEF;
 		padding-top: 55px;
@@ -201,7 +205,6 @@
 		min-width: 400px;
 		max-height:900px;
 		max-width: 1000px;
-		box-shadow:0px 10px 10px rgba(0,0,0,0.6);
 		display:flex;
 	}
 
@@ -258,6 +261,21 @@
 	}
 
 	.minicadre {
-		
+		border:1px solid rgba(0,0,0,0.5);
+		max-width: 500px;
+		margin-left:auto;
+		margin-right:auto;
+		margin-top:50px;
+		margin-bottom:50px;
+		padding-top:50px;
+		padding-bottom:50px;
+		border-radius:15px;
+		box-shadow: 0px 10px 10px rgba(0,0,0,0.5);
 	}
+
+	.detail {
+		margin-bottom:25px;
+		margin-top:25px;
+	}
+
 </style>
