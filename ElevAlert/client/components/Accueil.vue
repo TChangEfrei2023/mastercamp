@@ -164,13 +164,13 @@
 
 		
 	.pic2 {
-		background-image:url("../img/schema.png");
+		background-image:url("../img/screenshotClient.png");
 		background-color:rgba(0,0,0,0.3);
 	}
 
 		
 	.pic3 {
-		background-image:url("../img/schema.png");
+		background-image:url("../img/details.png");
 		background-color:rgba(0,0,0,0.3);
 	}
 
@@ -188,10 +188,11 @@
 		padding-bottom:100px;
 		padding-right:50px;
 		padding-left:50px;
-		background-color:rgba(0,0,0,0.4);
+		background-color:rgba(0,0,0,0.5);
 		color:white;
 		border-radius:5px;
 		font-size:20px;
+		z-index:-2;
 	}
 
 	.display {
@@ -206,9 +207,10 @@
 
 	.sectionTitle {
 		color:white;
-		background-color:rgba(0,0,0,0.4);
+		background-color:rgba(0,0,0,0.5);
 		padding-top:100px;
 		font-size:30px;
+		z-index: -1;
 	}
 
 	.sizeBtn {
@@ -218,7 +220,7 @@
 		color:white;
 		background-color: rgba(255,255,255,1);
 		position:absolute;
-		z-index: 999;
+		z-index: 2;
 		font-size:100px;
 		opacity:0.1;
 	}
@@ -228,6 +230,7 @@
 		opacity:0.9;
 		background-repeat: no-repeat;
 		background-position:center;
+		background-size: 100%;
 		height:100%;
 		width:100%;
 		filter:blur(1px);
