@@ -2,7 +2,7 @@
 	<header>
 		<nav class="navBar">
 			<div class="containerLogo">
-				<router-link to='/' class="left"><img class="logo" src="./logo.png" title="ElevAlert"></router-link>
+				<router-link to='/' class="left"><img class="logo" src="./img/logo.png" title="ElevAlert"></router-link>
 			</div>
 			<div class="containerNavBtn">
 				<router-link to='/clients' class="navButton" v-if="isLoggedIn && isEmployee"> Mes clients </router-link>
@@ -16,8 +16,8 @@
 				</span>
 				<button class="navButton" @click="disconnect()"  v-if="isLoggedIn">  Se déconnecter </button>
 				<router-link to='/login' class="navButton" v-else> Se connecter </router-link>
-				<button class="discButton" @click="showHide()" v-if="isLoggedIn && getNotifLength == 0"> <img class="notifZero" src="./notif.png" title="Voir les notifications"> {{ getNotifLength }} </button>
-				<button class="discButton" @click="showHide()" v-if="isLoggedIn && getNotifLength > 0"> <img class="notifMore" src="./notif.png" title="Voir les notifications"> {{ getNotifLength }} </button>
+				<button class="discButton" @click="showHide()" v-if="isLoggedIn && getNotifLength == 0"> <img class="notifZero" src="./img/notif.png" title="Voir les notifications"> {{ getNotifLength }} </button>
+				<button class="discButton" @click="showHide()" v-if="isLoggedIn && getNotifLength > 0"> <img class="notifMore" src="./img/notif.png" title="Voir les notifications"> {{ getNotifLength }} </button>
 			</div>
 		</nav>
 		<div class="notifBox" v-if="!hidden && isLoggedIn">

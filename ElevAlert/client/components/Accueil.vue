@@ -1,8 +1,14 @@
 <template>
-	<div id="acc">
-		<h1>Bienvenue sur ElevAlert !</h1>
-		<p class="presentation1">ElevAlert est un service technique qui permet à ses adhérants d'avoir 
+	<div>
+		<section id="cover">
+			<div class = "cover-contain">
+				<h1>Bienvenue</h1>
+				<h1>sur</h1> 
+				<h1>ElevAlert</h1>
+			</div>
+			<p class="presentation1">ElevAlert est un service technique qui permet à ses adhérants d'avoir 
 			une meilleure vue sur les éventuelles pannes qui peuvent se produire à tout moment.</p>
+		</section>
 		<h2> - Nos services - </h2>
 		<br>
 		<div class="display">
@@ -71,13 +77,53 @@
 </script>
 
 <style scoped>
+
+	#cover {
+		background-image: url("../img/ascenseur.jpg");
+		background-size: cover;
+		background-position: top center;
+		position: relative;
+		z-index: 1;
+		height: 100%;
+		width: 100%;
+	}
+
+	#cover::after {
+		content: '';
+		position: absolute;
+		left: 0;
+		top: 0;
+		height: 100%;
+		width: 100%;
+		background-color: black;
+		opacity: .6;
+		z-index: -1;
+	}
+	#cover .cover-contain h1{
+		display: block;
+		font-size: 4rem;
+		width: fit-content;
+		color: #EFEFEF;
+		margin-left: auto;
+    	margin-right: auto;
+		padding-top: 40px;
+	}
+
+	#cover .cover-contain p{
+		padding: 5px;
+		
+	}
+	#cover .cover-contain{
+		padding-top: 30px;
+	}
+
+
 	.cadre {
 		border:1px black solid;
 	}
 	
 	.test {
-		display:block;
-		position:absolute;
+
 		background-image:url("/schema.png");
 		background-color:rgba(0,0,0,0.2);
 		opacity:0.7;
@@ -94,6 +140,8 @@
 		margin:auto;
 		margin-top:25px;
 		margin-bottom:25px;
+		color: #EFEFEF;
+		padding-top: 55px;
 	}
 
 	.presentation2 {

@@ -18,7 +18,7 @@
               <span></span>
               <label>Mot de passe</label>
               </div>
-              <span @click="showPassword()" class="icon-field"><img id="eye" class ="eye-icone" src="../eye-opened.png"></span>
+              <span @click="showPassword()" class="icon-field"><img id="eye" class ="eye-icone" src="./img/eye-opened.png"></span>
               <button class = "connectButton" @click="connect()">Connexion</button>
             </form>
           </div>
@@ -65,11 +65,11 @@ module.exports = {
       var eye = document.getElementById("eye");
       if (x.type === "password") {
         x.type = "text";
-        eye.setAttribute("src", "../eye-opened.png");
+        eye.setAttribute("src", "../img/eye-opened.png");
       } 
       else {
         x.type = "password";
-        eye.setAttribute("src", "../eye-closed.png");
+        eye.setAttribute("src", "../img/eye-closed.png");
       }
     }
   }
