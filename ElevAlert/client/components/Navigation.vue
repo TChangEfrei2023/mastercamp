@@ -1,31 +1,33 @@
 <template>
 	<header>
 		<nav class="navBar" id="navBar-id">
+			<a class="icon" @click="hamburgerFunc()" v-if="isLoggedIn">
+				<i class="fa fa-bars"></i>
+			</a>
 			<div class="containerNavBtn">
 				<ul>
-				<span id="user" class="navText" v-if="isLoggedIn"> 
-					{{ getPrivilege() }} 
-					<b> {{ info.nom }}</b> 
-				</span>
-				<li><router-link to='/clients' class="navButton" v-if="isLoggedIn && isEmployee"> Mes clients </router-link></li>
-				<li><router-link to='/elevators' class="navButton" v-if="isLoggedIn"> Mes ascenseurs </router-link></li>
-				<li><router-link to='/log' class="navButton" v-if="isLoggedIn"> Log </router-link></li>
-				
+					<li>
+						<span id="user" class="navText" v-if="isLoggedIn"> 
+							{{ getPrivilege() }} 
+							<b> {{ info.nom }}</b> 
+						</span>
+					</li>
+					<div class="line2"></div>
+					<li><router-link to='/clients' class="navButton" v-if="isLoggedIn && isEmployee"> Mes clients </router-link></li>
+					<li><router-link to='/elevators' class="navButton" v-if="isLoggedIn"> Mes ascenseurs </router-link></li>
+					<li><router-link to='/log' class="navButton" v-if="isLoggedIn"> Log </router-link></li>
 				</ul>
 			</div>
 			<div class="containerLogo">
 				<router-link to='/' class="left"><img class="logo" src="./img/logo.png" title="ElevAlert"></router-link>
 			</div>
 			<div class="containerOtherBtn">
-
-				<button class="navButton" @click="disconnect()"  v-if="isLoggedIn">  Se déconnecter </button>
+				<button class="navButton adapt2" @click="disconnect()"  v-if="isLoggedIn">  Se déconnecter </button>
+				<button class="discButton adapt" @click="disconnect()" v-if="isLoggedIn"> <img class="logoLogout" src="./img/logout.png" title="Se déconnecter"></button>
 				<router-link to='/login' class="navButton" v-else> Se connecter </router-link>
 				<button class="discButton" @click="showHide()" v-if="isLoggedIn && getNotifLength == 0"> <img class="notifZero" src="./img/notif.png" title="Voir les notifications"> {{ getNotifLength }} </button>
 				<button class="discButton" @click="showHide()" v-if="isLoggedIn && getNotifLength > 0"> <img class="notifMore" src="./img/notif.png" title="Voir les notifications"> {{ getNotifLength }} </button>
 			</div>
-			<a class="icon" @click="hamburgerFunc()">
-				<i class="fa fa-bars"></i>
-			</a>
 		</nav>
 		<div class="notifBox" v-if="!hidden && isLoggedIn">
 			<p class="announcement"> Notifications </p>
@@ -124,53 +126,6 @@
 
 <style scoped>
 
-	@media screen and (max-width: 830px) {
-		.navBar .containerNavBtn {
-			display: none;
-		}
-		.navBar a.icon {
-			float: right;
-			display: block;
-			width: 70px;
-			height: 70px;
-		}
-		.navBar.responsive {
-			position: relative;
-		}
-  		.navBar.responsive .icon{
-			position: absolute;
-			right: 0;
-			top: 0;
-  		}
-		.navBar.responsive div{
-			float: none;
-			display: block;
-			text-align: left;
-		}
-		.navBar.responsive .containerNavBtn{
-			width: 100%;
-			background: #F4F4F4;
-			top: 80px;
-			position: fixed;
-			align-content: center;
-		}
-		.navBar.responsive ul li{
-			display: block;
-			
-		}
-	}
-
-	.navBar .icon{
-		color: black;
-
-		float: left;
-		display: block;
-		text-align: center;
-		padding: 14px 16px;
-		font-size: 17px;
-
-	}
-
 	.notifBox {
 		overflow-x: hidden;
 		position:absolute;
@@ -216,11 +171,21 @@
 		margin:auto;
 		background-color:black;
 	}
+	
+	.line2 {
+		width:150px;
+		height:1px;
+		margin:auto;
+		background-color:black;
+		margin-bottom:5px;
+		display:none;
+	}
 
 	.navBar {
 		display:flex;
 		flex-wrap:wrap;
 		justify-content:space-around;
+		height:58px;
 	}
 
 	li{
@@ -284,6 +249,10 @@
 		margin-right:50px;
 		font-size: auto;
 		text-align: right;
+		padding-top:5px;
+		padding-bottom:5px;
+		padding-left:10px;
+		padding-right:10px;
 	}
 
     .logo {
@@ -292,21 +261,25 @@
     }
 
 	.notifZero {
-		height:40px;
 		width:40px;
 		vertical-align:top;
 		filter:brightness(0);
 	}
 
 	.notifMore {
-		height:40px;
 		width:40px;
+		vertical-align:top;
+	}
+
+	.logoLogout {
+		width:30px;
 		vertical-align:top;
 	}
 
 	.discButton {
 		border:none;
-		padding-left:10px;
+		min-width:50px;
+		padding-left:5px;
 		padding-right:5px;
 		background-color: #F4F4F4;
 	}
@@ -332,5 +305,94 @@
 		box-shadow:none;
 		transform:translateY(4px);
 	}
+
+	.navBar .icon{
+		color: black;
+		margin-top:auto;
+		margin-bottom:auto;
+		margin-left:20px;
+		display:none;
+	}
+
+	.adapt {
+		display:none;
+	}
+
+	@media screen and (max-width: 1000px) {
+		.navBar .containerNavBtn {
+			display: none;
+		}
+		.navBar .icon {
+			display:block !important;
+			padding:10px;
+			border-radius:6px;
+		}
+
+		.navBar .icon:hover {
+			background-color:lightgrey;
+			transition:0.5s;
+		}
+
+		.navBar .icon:active {
+			background-color:darkgray;
+			transition:0s;
+		}
+
+		.navBar.responsive .containerNavBtn{
+			display:flex;
+			overflow-x: hidden;
+			position:absolute;
+			top:58px;
+			left:0;
+			background-color:white;
+			border:1px rgba(0, 0, 0,.2) solid;
+			box-shadow:0px 2px 4px rgba(0, 0, 0,.2);
+			border-radius:8px;
+			padding:5px;
+			min-width:100px;
+			min-height:100px;
+			max-height:calc(75vh - 75px);
+			z-index: 1000;
+		}
+
+		.navBar.responsive ul li{
+			display: block;
+		}
+
+		.navBar.responsive .containerNavBtn .navButton {
+			background-color:white;
+			width:130px;
+		}
+
+		.navBar.responsive .containerNavBtn .navButton:active {
+			background-color:gray;
+			width:130px;
+		}
+
+		.navBar.responsive .containerNavBtn .navButton:hover {
+			background-color:lightgray;
+			width:130px;
+			border-radius:5px;
+		}
+
+		.line2 {
+			display:block !important;
+		}
+	}
+
+	@media screen and (max-width: 600px) {
+		.adapt {
+			display:block !important;
+		}
+
+		.adapt2 {
+			display:none !important;
+		}
+
+		.discButton .adapt {
+			padding-left:0px !important;
+		}
+	}
+
 </style>
 

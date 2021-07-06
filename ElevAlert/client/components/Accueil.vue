@@ -13,34 +13,37 @@
 		<h2> - Nos services - </h2>
 		<br>
 		<div class="inline">
-			<button class="sizeBtn" @click="moveSlideShow(false)"> &lt; </button>
 			<div class="display">
+				<button class="sizeBtn left" @click="moveSlideShow(false)"> &lt; </button>
 				<div v-if="page==0" class="cadre">
-					<div class="test"></div>
+					<div class="image pic0"></div>
 					<h3 class="sectionTitle"> Détection des pannes</h3>
 					<p class="presentation2"> En tant qu'adhérant chez ElevAlert, vous profiterez d'une réduction considérable de temps de réparation de vos ascenseurs en cas de pannes.
 					Notre but est de faciliter la réparation des pannes de vos ascenseurs en localisant l'origine des pannes avec une bonne précision à l'aide de nos outils. </p>
 				</div>
 				<div v-if="page==1" class="cadre">
-					<h3> Rapport détaillé pour chaque panne </h3>
+					<div class="image pic1"></div>
+					<h3 class="sectionTitle"> Rapport détaillé pour chaque panne </h3>
 					<p class="presentation2"> Grâce à la détection des pannes, nous sommes capables de vous fournir un rapport détaillé sur une éventuelle panne qui permettra 
 						aux réparateurs de se focaliser sur le problème et ainsi réduire considérablement le temps de réparation. </p>
 				</div>
 				<div v-if="page==2" class="cadre">
-					<h3> Accès à la platforme ElevAlert </h3>
+					<div class="image pic2"></div>
+					<h3 class="sectionTitle"> Accès à la platforme ElevAlert </h3>
 					<p class="presentation2"> Vous êtes une entreprise possédant beaucoup d'ascenseurs ? Pas de soucis, nos adhérants possèdent un accès sur notre
 						platforme web. Il vous suffira de vous connecter afin d'avoir une vue générale sur l'état de vos ascenseurs équipés de nos outils, 
 						ainsi qu'un historique des pannes réglées et même en cours de réparation. </p>
 				</div>
 				<div v-if="page==3" class="cadre">
-					<h3> Notifications des pannes </h3>
+					<div class="image pic3"></div>
+					<h3 class="sectionTitle"> Notifications des pannes </h3>
 					<p class="presentation2"> Le plus important pour nos adhérants est de pouvoir être averti le plus vite possible. Lorsqu'une panne survient,
 						notre serveur est capable de recevoir l'information rapidement afin qu'on puisse vous en avertir par deux moyens : 
 						un appel téléphonique de notre part pour vous avertir et fournir les détails, et un mail à votre adresse éléctronique dans le cas où
 						vous seriez indisponible.</p>
 				</div>
+				<button class="sizeBtn right" @click="moveSlideShow(true)"> &gt; </button>
 			</div>
-			<button class="sizeBtn" @click="moveSlideShow(true)"> &gt; </button>
 		</div>
 		<div class="minicadre">
 			<h2> - Contact - </h2>
@@ -129,6 +132,7 @@
 		opacity: .6;
 		z-index: -1;
 	}
+
 	#cover .cover-contain h1{
 		display: block;
 		font-size: 4rem;
@@ -140,28 +144,34 @@
 	#cover .cover-contain p{
 		padding: 5px;
 	}
-	.cover-contain{
-
-	}
 
 	.cadre {
-		border:1px black solid;
+		z-index:0;
 	}
 	
-	.test {
+	.pic0 {
+		background-image:url("../img/schema.png");
+		background-color:rgba(255,255,255,0.1);
+	}
 
-		background-image:url("/schema.png");
+		
+	.pic1 {
+		background-image:url("../img/reparation.jpg");
 		background-color:rgba(0,0,0,0.3);
-		background-repeat: no-repeat;
-		background-position:center;
-		height:100%;
-		width:100%;
-		max-width:70vw;
-		max-height: 70vh;
-		opacity:0.5;
-		z-index: -2;
-		filter:blur(2px);
-		box-sizing: border-box;
+		background-attachment:scroll;
+		background-size:100%;
+	}
+
+		
+	.pic2 {
+		background-image:url("../img/schema.png");
+		background-color:rgba(0,0,0,0.3);
+	}
+
+		
+	.pic3 {
+		background-image:url("../img/schema.png");
+		background-color:rgba(0,0,0,0.3);
 	}
 
 	.presentation1 {
@@ -171,37 +181,80 @@
 		margin-bottom:25px;
 		color: #EFEFEF;
 		padding-top: 55px;
-
 	}
 
 	.presentation2 {
-		max-width:800px;
-		margin:auto;
-		margin-top:40vh;
-		background-color:rgba(0,0,0,0.3);
+		padding-top:150px;
+		padding-bottom:100px;
+		padding-right:50px;
+		padding-left:50px;
+		background-color:rgba(0,0,0,0.4);
+		color:white;
 		border-radius:5px;
-		padding:25px;
+		font-size:20px;
 	}
 
 	.display {
-		max-width:70vw;
-		max-height:70vh;
-		margin-top:auto;
-		margin-bottom:auto;
 		position:relative;
-		z-index: -2;
+		min-height: 300px;
+		min-width: 400px;
+		max-height:900px;
+		max-width: 1000px;
+		box-shadow:0px 10px 10px rgba(0,0,0,0.6);
+		display:flex;
 	}
 
 	.sectionTitle {
-		padding:25px;
-		background-color:rgba(0,0,0,0.3)
+		color:white;
+		background-color:rgba(0,0,0,0.4);
+		padding-top:100px;
+		font-size:30px;
+	}
+
+	.sizeBtn {
+		width:50%;
+		height:100%;
+		border:none;
+		color:white;
+		background-color: rgba(255,255,255,1);
+		position:absolute;
+		z-index: 999;
+		font-size:100px;
+		opacity:0.1;
+	}
+
+	.image {
+		background-color:rgba(0,0,0,0.9);
+		opacity:0.9;
+		background-repeat: no-repeat;
+		background-position:center;
+		height:100%;
+		width:100%;
+		filter:blur(1px);
+		filter:brightness(0.5);
+		box-sizing: border-box;
+		position:absolute;
+		z-index: -2;
+	}
+
+	.left {
+		margin-right:50%;
+		text-align: left;
+		background-color: rgba(100,255,255,0);
+	}
+
+	.right {
+		margin-left:50%;
+		text-align: right;
+		background-color: rgba(255,255,100,0);
+	}
+
+	.inline {
+		display:flex;
+		justify-content: center;
 	}
 
 	.minicadre {
-		padding-top:100px;
-		padding-bottom:100px;
-		margin:auto;
+		
 	}
-
-	
 </style>
