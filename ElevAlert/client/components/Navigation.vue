@@ -1,13 +1,15 @@
 <template>
 	<header>
-		<nav class="navBar">
+		<nav class="navBar" id="navBar-id">
 			<div class="containerLogo">
 				<router-link to='/' class="left"><img class="logo" src="./img/logo.png" title="ElevAlert"></router-link>
 			</div>
 			<div class="containerNavBtn">
-				<router-link to='/clients' class="navButton" v-if="isLoggedIn && isEmployee"> Mes clients </router-link>
-				<router-link to='/elevators' class="navButton" v-if="isLoggedIn"> Mes ascenseurs </router-link>
-				<router-link to='/log' class="navButton" v-if="isLoggedIn"> Log </router-link>
+				<ul>
+				<li><router-link to='/clients' class="navButton" v-if="isLoggedIn && isEmployee"> Mes clients </router-link></li>
+				<li><router-link to='/elevators' class="navButton" v-if="isLoggedIn"> Mes ascenseurs </router-link></li>
+				<li><router-link to='/log' class="navButton" v-if="isLoggedIn"> Log </router-link></li>
+				</ul>
 			</div>
 			<div class="containerOtherBtn">
 				<span id="user" class="navText" v-if="isLoggedIn"> 
@@ -19,6 +21,9 @@
 				<button class="discButton" @click="showHide()" v-if="isLoggedIn && getNotifLength == 0"> <img class="notifZero" src="./img/notif.png" title="Voir les notifications"> {{ getNotifLength }} </button>
 				<button class="discButton" @click="showHide()" v-if="isLoggedIn && getNotifLength > 0"> <img class="notifMore" src="./img/notif.png" title="Voir les notifications"> {{ getNotifLength }} </button>
 			</div>
+			<a class="icon" @click="hamburgerFunc()">
+				<i class="fa fa-bars"></i>
+			</a>
 		</nav>
 		<div class="notifBox" v-if="!hidden && isLoggedIn">
 			<p class="announcement"> Notifications </p>
@@ -102,12 +107,68 @@
 		checkNewBreakdown(){
 			console.log("Checking...")
 			this.$emit('check-new-breakdown')
+		},
+		hamburgerFunc() {
+			var x = document.getElementById("navBar-id");
+			if (x.className === "navBar") {
+				x.className += " responsive";
+			} else {
+				x.className = "navBar";
+			}
 		}
 	}
   }
 </script>
 
 <style scoped>
+
+	@media screen and (max-width: 830px) {
+		.navBar .containerNavBtn {
+			display: none;
+		}
+		.navBar a.icon {
+			float: right;
+			display: block;
+			width: 70px;
+			height: 70px;
+		}
+		.navBar.responsive {
+			position: relative;
+		}
+  		.navBar.responsive .icon{
+			position: absolute;
+			right: 0;
+			top: 0;
+  		}
+		.navBar.responsive div{
+			float: none;
+			display: block;
+			text-align: left;
+		}
+		.navBar.responsive .containerNavBtn{
+			width: 100%;
+			background: #F4F4F4;
+			top: 80px;
+			position: fixed;
+			align-content: center;
+		}
+		.navBar.responsive ul li{
+			display: block;
+			
+		}
+	}
+
+	.navBar .icon{
+		color: black;
+
+		float: left;
+		display: block;
+		text-align: center;
+		padding: 14px 16px;
+		font-size: 17px;
+
+	}
+
 	.notifBox {
 		overflow-x: hidden;
 		position:absolute;
@@ -158,6 +219,11 @@
 		display:flex;
 		flex-wrap:wrap;
 		justify-content:space-around;
+	}
+
+	li{
+		list-style-type: none;
+		display: inline;
 	}
 
 	header {

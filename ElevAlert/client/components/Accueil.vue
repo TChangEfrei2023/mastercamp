@@ -5,9 +5,10 @@
 				<h1>Bienvenue</h1>
 				<h1>sur</h1> 
 				<h1>ElevAlert</h1>
-			</div>
-			<p class="presentation1">ElevAlert est un service technique qui permet à ses adhérants d'avoir 
+				<p class="presentation1">ElevAlert est un service technique qui permet à ses adhérants d'avoir 
 			une meilleure vue sur les éventuelles pannes qui peuvent se produire à tout moment.</p>
+			</div>
+			
 		</section>
 		<h2> - Nos services - </h2>
 		<br>
@@ -105,13 +106,16 @@
 	}
 
 	#cover {
+		display: flex;
 		background-image: url("../img/ascenseur.jpg");
 		background-size: cover;
 		background-position: top center;
-		position: relative;
-		z-index: 1;
 		height: 100%;
 		width: 100%;
+		align-items: center;
+  		justify-content: center;
+		font-size: 30px;
+		z-index: 1;
 	}
 
 	#cover::after {
@@ -128,19 +132,16 @@
 	#cover .cover-contain h1{
 		display: block;
 		font-size: 4rem;
-		width: fit-content;
 		color: #EFEFEF;
 		margin-left: auto;
     	margin-right: auto;
-		padding-top: 40px;
 	}
-
+	
 	#cover .cover-contain p{
 		padding: 5px;
-		
 	}
-	#cover .cover-contain{
-		padding-top: 30px;
+	.cover-contain{
+
 	}
 
 	.cadre {
@@ -201,4 +202,6 @@
 		padding-bottom:100px;
 		margin:auto;
 	}
+
+	
 </style>
