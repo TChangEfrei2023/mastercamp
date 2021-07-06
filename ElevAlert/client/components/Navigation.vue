@@ -1,21 +1,23 @@
 <template>
 	<header>
 		<nav class="navBar" id="navBar-id">
-			<div class="containerLogo">
-				<router-link to='/' class="left"><img class="logo" src="./img/logo.png" title="ElevAlert"></router-link>
-			</div>
 			<div class="containerNavBtn">
 				<ul>
-				<li><router-link to='/clients' class="navButton" v-if="isLoggedIn && isEmployee"> Mes clients </router-link></li>
-				<li><router-link to='/elevators' class="navButton" v-if="isLoggedIn"> Mes ascenseurs </router-link></li>
-				<li><router-link to='/log' class="navButton" v-if="isLoggedIn"> Log </router-link></li>
-				</ul>
-			</div>
-			<div class="containerOtherBtn">
 				<span id="user" class="navText" v-if="isLoggedIn"> 
 					{{ getPrivilege() }} 
 					<b> {{ info.nom }}</b> 
 				</span>
+				<li><router-link to='/clients' class="navButton" v-if="isLoggedIn && isEmployee"> Mes clients </router-link></li>
+				<li><router-link to='/elevators' class="navButton" v-if="isLoggedIn"> Mes ascenseurs </router-link></li>
+				<li><router-link to='/log' class="navButton" v-if="isLoggedIn"> Log </router-link></li>
+				
+				</ul>
+			</div>
+			<div class="containerLogo">
+				<router-link to='/' class="left"><img class="logo" src="./img/logo.png" title="ElevAlert"></router-link>
+			</div>
+			<div class="containerOtherBtn">
+
 				<button class="navButton" @click="disconnect()"  v-if="isLoggedIn">  Se déconnecter </button>
 				<router-link to='/login' class="navButton" v-else> Se connecter </router-link>
 				<button class="discButton" @click="showHide()" v-if="isLoggedIn && getNotifLength == 0"> <img class="notifZero" src="./img/notif.png" title="Voir les notifications"> {{ getNotifLength }} </button>
@@ -241,6 +243,7 @@
 		margin-top:auto;
 		margin-bottom:auto;
 		overflow: hidden;
+		position: absolute;
 	}
 
 	.discButton:hover, .navButton:hover {
@@ -280,6 +283,7 @@
 		margin:auto;
 		margin-right:50px;
 		font-size: auto;
+		text-align: right;
 	}
 
     .logo {
