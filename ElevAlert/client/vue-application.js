@@ -55,7 +55,7 @@ var app = new Vue({
         this.clients = clientList.data.content
       }
 
-      setInterval(this.checkNewBreakdown,30000)
+      setInterval(this.checkNewBreakdown,15000)
     }
   },
   methods: {
