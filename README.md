@@ -25,7 +25,7 @@ ElevAlert est un service qui utilise un site web en VueJS, testé et fonctionnel
 * Ajouter des clients, des ascenseurs et des nouveaux composants
 
 ### Les fonctionnalités du simulateur :
-* Alerter le serveur : le moment où un componsant de l'ascenseur n'est plus opérationnel, un détecteur chargé de tester ce composant enclenchera un mécanisme d'alerte.
+* Alerter le serveur : le moment où un composant de l'ascenseur n'est plus opérationnel, un détecteur chargé de tester ce composant enclenchera un mécanisme d'alerte.
 * Simuler un ascenseur : chaque ascenseur doit pouvoir s'identifier pour des mesures de sécurité et notifier le serveur avec son identifiant en cas de panne.
 * Simuler une erreur : visuel reflétant un ascenseur qui monte et qui descend aléatoirement. Simule l'usure des matériaux et génère une erreur.
 * Simuler une réparation : lorsque l'ascenseur est réparé, il doit pouvoir informer le serveur. 
