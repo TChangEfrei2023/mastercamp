@@ -78,7 +78,7 @@ npm start
 
 ### Partie Simulateur Java
 
-Une fois lancé, dans votre IDE de Java (Eclipse, IntelliJ ou autre) avec les dépendances de JavaFX installées. Importer le projet Simulateur qui se trouve dans le répertoire 'Simulateur'. Modifier dans le fichier 'src\simulateur\Request.java' à la ligne 31 :
+Une fois lancé, dans votre IDE de Java (Eclipse, IntelliJ ou autre) avec les dépendances de JavaFX installées, importer le projet Simulateur qui se trouve dans le répertoire 'Simulateur'. Modifier dans le fichier 'src\simulateur\Request.java' à la ligne 31 :
 ```java
 address = "http://VOTRE ADRESSE IP (OU localhost)/api";
 ```
