@@ -233,7 +233,7 @@
 		display:table-cell;
 		border:none;
 		margin:auto;
-		padding:20px;
+		padding:19.5px;
 		padding-left:8px;
 		padding-right:8px;
 		font-size: 15px;
@@ -393,6 +393,5 @@
 			padding-left:0px !important;
 		}
 	}
-
 </style>
 

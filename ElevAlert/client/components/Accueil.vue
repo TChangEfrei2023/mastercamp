@@ -278,4 +278,16 @@
 		margin-top:25px;
 	}
 
+	@media screen and (max-width:500px){
+		.cover-contain {
+			padding-bottom:50px;
+			margin:0;
+			
+		}
+
+		.presentation1 {
+			margin-top:25px !important;
+		}
+	}
+
 </style>

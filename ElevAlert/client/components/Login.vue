@@ -14,11 +14,11 @@
               <label>Identifiant</label>
               </div>
               <div class= "text-field">
-              <input type="text" id="password-input" v-model="credentials.password" required>
+              <input type="password" id="password-input" v-model="credentials.password" required>
               <span></span>
               <label>Mot de passe</label>
               </div>
-              <span @click="showPassword()" class="icon-field"><img id="eye" class ="eye-icone" src="./img/eye-opened.png"></span>
+              <span @click="showPassword()" class="icon-field"><img id="eye" class ="eye-icone" src="./img/eye-closed.png"></span>
               <button class = "connectButton" @click="connect()">Connexion</button>
             </form>
           </div>

@@ -517,7 +517,7 @@ router.post('/connect',async(req,res) => {
     text:'SELECT * FROM "Elevator" WHERE "idElevator" = $1;',
     values:[id]
   })
-  
+
   const foundElevator = resultElevator.rows.find(a => a.idElevator == id)
   if(foundElevator){
     const resultClient = await client.query({
@@ -610,7 +610,7 @@ router.put('/error/:idComponent',async(req,res) => {
       values:[foundClient.idAdresse]
     })
     const foundAdresse = resultAdresse.rows.find(a => a.idAdresse = foundClient.idAdresse)
-    /*
+    
     let transport = nodemailer.createTransport({
       service: "Hotmail",
       auth: {
@@ -636,14 +636,13 @@ router.put('/error/:idComponent',async(req,res) => {
         console.log(info)
       }
     })
-    */
+    
     res.json({ description: found.description, codeError: found.idError, idElevator: req.session.elevatorId, date: currentUTCDate })
     return
   }
   res.status(400).json({ message: 'Component or elevator not found.' })
   return
 })
-
 
 /*  If the website receives a notification of a breakdown, then it has to confirm that it has been notified.
     This function will set to true the 'reception' attribute of notified breakdowns.

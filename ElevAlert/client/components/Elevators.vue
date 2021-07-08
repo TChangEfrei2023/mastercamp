@@ -44,7 +44,7 @@
               <td v-if="!visibilityForm">{{ entry.idElevator }}</td>
               <td>{{ entry.idError }}</td>
               <td>{{ entry.nom }}</td>
-              <td class="no"><button class="custom-btn" @click="deleteComponent(entry.id)"> X </button></td>
+              <td class="no"><button class="custom-btn croix" @click="deleteComponent(entry.id)"> X </button></td>
             </tr>
           </tbody>
         </table>
@@ -192,6 +192,12 @@
 </script>
 
 <style scoped>
+.croix {
+  width:30px;
+  color:red;
+  border:none;
+}
+
 .no {
   border:none;
 }
